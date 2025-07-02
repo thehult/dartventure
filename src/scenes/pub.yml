@@ -1,0 +1,63 @@
+background: /game_assets/scenes/pub/background.png
+characters:
+  bartender:
+    name: Bartender
+    image: /game_assets/scenes/pub/bartender.png
+  drinker:
+    name: Regular
+    image: /game_assets/scenes/pub/drinker.png
+actions:
+  - name: Play a chump
+    icon: /game_assets/scenes/pub/drinker.png
+    description: Play a game of darts with a regular.
+    action: play
+    parameters:
+      game: x01
+      from: 301
+  - name: Pub tournament
+    icon: /logo512.png
+    description: Play in the pub tournament.
+    unlocked_by: pub-tournament-invite
+    requirements:
+      - reputation: 10
+    action: tournament
+    parameters:
+      game: x01
+      from: 301
+  # - name: Pub tournament
+  #   icon: /logo512.png
+  #   description: Play in the pub tournament.
+  #   action: tournament
+  # - name: Pub tournament
+  #   icon: /logo512.png
+  #   description: Play in the pub tournament.
+  #   action: tournament
+  # - name: Pub tournament
+  #   icon: /logo512.png
+  #   description: Play in the pub tournament.
+  #   action: tournament
+stories:
+  - name: welcome
+    script:
+      - character: bartender
+      - dialogue: Hey there!
+      - dialogue: Welcome to my pub!
+      - dialogue: You look like someone who enjoys a game of darts.
+      - dialogue: Lots of chumps play here, they are probably up for a game.
+      - dialogue: If you build up some *reputation*, I'll invite you to the pub tournament.
+      - dialogue: But more importantly, enjoy yourself!
+  - name: first-chump
+    script:
+      - character: drinker
+      - dialogue: Did I hear you are looking for a game?
+      - dialogue: I am always up for a game.
+
+  - name: pub-tournament-invite
+    requirements:
+      - reputation: 20
+    script:
+      - character: bartender
+      - dialogue: I noticed that you are making a name for yourself around here.
+      - dialogue: How about joining the pub tournament?
+      - dialogue: It will be a great opportunity to show off your skills.
+      - dialogue: And perhaps win some *money*!
