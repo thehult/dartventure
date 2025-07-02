@@ -2,8 +2,8 @@ import type { Character, Scene, ScriptAction, Story } from '@/types/Scene'
 import { useEffect, useMemo, useState } from 'react'
 import { useGameSave } from './useGameSave'
 
-export const useScene = (scene: Record<string, any>) => {
-  const { background, characters, actions, stories } = scene as Scene
+export const useStory = (scene: Scene) => {
+  const { characters, stories } = scene as Scene
   const gameSave = useGameSave()
   const [loaded] = useState(true)
 
@@ -75,9 +75,6 @@ export const useScene = (scene: Record<string, any>) => {
 
   return {
     loaded,
-    background,
-    actions,
-    characters,
     hasStory,
     currentCharacter,
     currentDialogue,

@@ -1,15 +1,37 @@
-import type { GameSave } from '@/types/GameSave'
+import {
+  migrateGameSave,
+  type GameSave,
+  type GameSaveVersions,
+} from '@/types/GameSave'
 import type { Requirement } from '@/types/Scene'
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
+const defaultGameSave: GameSaveVersions = {
+  // const [gameSave, setGameSave] = useState<GameSave>({
+  version: 1,
+  money: 0,
+  reputation: 0,
+  completedStories: [],
+}
+
 export const useGameSave = (saveName: string = 'gameSave') => {
-  const [gameSave, setGameSave] = useLocalStorage<GameSave>(saveName, {
-    // const [gameSave, setGameSave] = useState<GameSave>({
-    money: 0,
-    reputation: 0,
-    completedStories: [],
-  })
+  const [gameSave, setGameSave] = useLocalStorage<GameSaveVersions>(
+    saveName,
+    defaultGameSave,
+  )
+  const [_, setBackup] = useLocalStorage<GameSaveVersions | undefined>(
+    `${saveName}_backup`,
+    undefined,
+  )
+  useEffect(() => {
+    const migratedGameSave = migrateGameSave(gameSave)
+    if (migratedGameSave.version !== gameSave.version) {
+      setBackup(gameSave)
+      setGameSave(migratedGameSave)
+    }
+  }, [gameSave])
+
   const addMoney = (amount: number) => {
     setGameSave((prev) => ({
       ...prev,
@@ -47,9 +69,7 @@ export const useGameSave = (saveName: string = 'gameSave') => {
   }
 
   return {
-    money: gameSave.money,
-    reputation: gameSave.reputation,
-    completedStories: gameSave.completedStories,
+    ...(gameSave as GameSave),
     addMoney,
     addReputation,
     completeStory,

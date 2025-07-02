@@ -15,6 +15,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as GameIndexImport } from './routes/game/index'
 import { Route as GameSceneImport } from './routes/game/scene'
 import { Route as GamePubImport } from './routes/game/pub'
+import { Route as GameMatchImport } from './routes/game/match'
 import { Route as GameMapImport } from './routes/game/map'
 
 // Create/Update Routes
@@ -43,6 +44,12 @@ const GamePubRoute = GamePubImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const GameMatchRoute = GameMatchImport.update({
+  id: '/game/match',
+  path: '/game/match',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const GameMapRoute = GameMapImport.update({
   id: '/game/map',
   path: '/game/map',
@@ -65,6 +72,13 @@ declare module '@tanstack/react-router' {
       path: '/game/map'
       fullPath: '/game/map'
       preLoaderRoute: typeof GameMapImport
+      parentRoute: typeof rootRoute
+    }
+    '/game/match': {
+      id: '/game/match'
+      path: '/game/match'
+      fullPath: '/game/match'
+      preLoaderRoute: typeof GameMatchImport
       parentRoute: typeof rootRoute
     }
     '/game/pub': {
@@ -96,6 +110,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/game/map': typeof GameMapRoute
+  '/game/match': typeof GameMatchRoute
   '/game/pub': typeof GamePubRoute
   '/game/scene': typeof GameSceneRoute
   '/game': typeof GameIndexRoute
@@ -104,6 +119,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/game/map': typeof GameMapRoute
+  '/game/match': typeof GameMatchRoute
   '/game/pub': typeof GamePubRoute
   '/game/scene': typeof GameSceneRoute
   '/game': typeof GameIndexRoute
@@ -113,6 +129,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/game/map': typeof GameMapRoute
+  '/game/match': typeof GameMatchRoute
   '/game/pub': typeof GamePubRoute
   '/game/scene': typeof GameSceneRoute
   '/game/': typeof GameIndexRoute
@@ -120,16 +137,30 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/game/map' | '/game/pub' | '/game/scene' | '/game'
+  fullPaths:
+    | '/'
+    | '/game/map'
+    | '/game/match'
+    | '/game/pub'
+    | '/game/scene'
+    | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/game/map' | '/game/pub' | '/game/scene' | '/game'
-  id: '__root__' | '/' | '/game/map' | '/game/pub' | '/game/scene' | '/game/'
+  to: '/' | '/game/map' | '/game/match' | '/game/pub' | '/game/scene' | '/game'
+  id:
+    | '__root__'
+    | '/'
+    | '/game/map'
+    | '/game/match'
+    | '/game/pub'
+    | '/game/scene'
+    | '/game/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GameMapRoute: typeof GameMapRoute
+  GameMatchRoute: typeof GameMatchRoute
   GamePubRoute: typeof GamePubRoute
   GameSceneRoute: typeof GameSceneRoute
   GameIndexRoute: typeof GameIndexRoute
@@ -138,6 +169,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GameMapRoute: GameMapRoute,
+  GameMatchRoute: GameMatchRoute,
   GamePubRoute: GamePubRoute,
   GameSceneRoute: GameSceneRoute,
   GameIndexRoute: GameIndexRoute,
@@ -155,6 +187,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/game/map",
+        "/game/match",
         "/game/pub",
         "/game/scene",
         "/game/"
@@ -165,6 +198,9 @@ export const routeTree = rootRoute
     },
     "/game/map": {
       "filePath": "game/map.tsx"
+    },
+    "/game/match": {
+      "filePath": "game/match.tsx"
     },
     "/game/pub": {
       "filePath": "game/pub.tsx"

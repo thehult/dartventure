@@ -3,31 +3,27 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Character } from '@/components/Character'
 import { Dialogue } from '@/components/Dialogue'
 
-import PubScene from '@/scenes/pub.yml'
-import { useScene } from '@/components/useScene'
+import { useStory } from '@/components/useStory'
 import { useClickAnyWhere } from 'usehooks-ts'
-import { Map } from '@/components/Map'
+import { ActionMap } from '@/components/ActionMap'
 import StatBar from '@/components/StatBar'
+import { useGameContext } from '@/components/GameContext'
+import type { SceneId } from '@/scenes/scenes'
+
+export type SceneSearchParams = {
+  sceneId: SceneId
+}
 
 export const Route = createFileRoute('/game/scene')({
   component: SceneComponent,
 })
 
 function SceneComponent() {
-  console.log(PubScene)
-  const {
-    loaded,
-    background,
-    characters,
-    actions,
-    hasStory,
-    currentCharacter,
-    currentDialogue,
-    advanceStory,
-  } = useScene(PubScene)
+  const { scene } = useGameContext()
+  const { loaded, hasStory, currentCharacter, currentDialogue, advanceStory } =
+    useStory(scene)
 
   useClickAnyWhere(() => {
-    console.log('Clicked anywhere, advancing story')
     advanceStory()
   })
 
@@ -40,9 +36,9 @@ function SceneComponent() {
   }
 
   return (
-    <Background background={background}>
+    <Background background={scene.background}>
       <StatBar />
-      {Object.values(characters).map((character) => (
+      {Object.values(scene.characters).map((character) => (
         <Character
           key={character.name}
           image={character.image}
@@ -50,24 +46,12 @@ function SceneComponent() {
           onEntered={characterEntered}
         />
       ))}
-      {/* {currentCharacter !== null && (
-        <Character
-          key={currentCharacter.name}
-          image={currentCharacter.image}
-          onEntered={characterEntered}
-        />
-      )} */}
       {currentDialogue !== null && (
         <Dialogue speaker={currentCharacter?.name} visible={true}>
           {currentDialogue}
         </Dialogue>
       )}
-      {!hasStory && <Map actions={actions} />}
-
-      {/* <Menu>
-        <MenuItem>Test 1</MenuItem>
-        <MenuItem>Test 2</MenuItem>
-      </Menu> */}
+      {!hasStory && <ActionMap actions={scene.actions} />}
     </Background>
   )
 }

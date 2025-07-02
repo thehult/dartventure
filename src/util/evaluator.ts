@@ -1,7 +1,10 @@
-import type { GameSave } from '@/types/GameSave'
+import type { GameSaveVersions } from '@/types/GameSave'
 import { Jexl } from 'jexl'
 
-export const evaluateRequirement = (requirement: string, context: GameSave) => {
+export const evaluateRequirement = (
+  requirement: string,
+  context: GameSaveVersions,
+) => {
   const jexl = new Jexl()
 
   jexl.addFunction('hasTag', (tag: string) => context.tags.includes(tag))

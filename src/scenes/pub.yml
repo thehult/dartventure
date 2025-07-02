@@ -10,10 +10,16 @@ actions:
   - name: Play a chump
     icon: /game_assets/scenes/pub/drinker.png
     description: Play a game of darts with a regular.
-    action: play
-    parameters:
-      game: x01
-      from: 301
+    action: match
+    gameId: x01
+    gameParameters:
+      startScore: 301
+    opponent:
+      skill: 0.2
+    reward:
+      reputation: 5
+    penalty:
+      reputation: -5
   - name: Pub tournament
     icon: /logo512.png
     description: Play in the pub tournament.
@@ -21,9 +27,9 @@ actions:
     requirements:
       - reputation: 10
     action: tournament
-    parameters:
-      game: x01
-      from: 301
+    gameId: x01
+    gameParameters:
+      startScore: 301
   # - name: Pub tournament
   #   icon: /logo512.png
   #   description: Play in the pub tournament.

@@ -1,0 +1,15 @@
+background: /game_assets/scenes/world/background.png
+characters:
+  you:
+    name: You
+actions:
+  - name: The Pub
+    icon: /game_assets/scenes/pub/bartender.png
+    description: Go play darts at the pub
+    action: navigate
+    sceneId: pub
+stories:
+  - name: intro
+    script:
+      - character: you
+      - dialogue: Let's see if I can become the world champion!
