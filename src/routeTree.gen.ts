@@ -12,12 +12,40 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as GameIndexImport } from './routes/game/index'
+import { Route as GameSceneImport } from './routes/game/scene'
+import { Route as GamePubImport } from './routes/game/pub'
+import { Route as GameMapImport } from './routes/game/map'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GameIndexRoute = GameIndexImport.update({
+  id: '/game/',
+  path: '/game/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GameSceneRoute = GameSceneImport.update({
+  id: '/game/scene',
+  path: '/game/scene',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GamePubRoute = GamePubImport.update({
+  id: '/game/pub',
+  path: '/game/pub',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GameMapRoute = GameMapImport.update({
+  id: '/game/map',
+  path: '/game/map',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -32,6 +60,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/game/map': {
+      id: '/game/map'
+      path: '/game/map'
+      fullPath: '/game/map'
+      preLoaderRoute: typeof GameMapImport
+      parentRoute: typeof rootRoute
+    }
+    '/game/pub': {
+      id: '/game/pub'
+      path: '/game/pub'
+      fullPath: '/game/pub'
+      preLoaderRoute: typeof GamePubImport
+      parentRoute: typeof rootRoute
+    }
+    '/game/scene': {
+      id: '/game/scene'
+      path: '/game/scene'
+      fullPath: '/game/scene'
+      preLoaderRoute: typeof GameSceneImport
+      parentRoute: typeof rootRoute
+    }
+    '/game/': {
+      id: '/game/'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof GameIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -39,32 +95,52 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/game/map': typeof GameMapRoute
+  '/game/pub': typeof GamePubRoute
+  '/game/scene': typeof GameSceneRoute
+  '/game': typeof GameIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/game/map': typeof GameMapRoute
+  '/game/pub': typeof GamePubRoute
+  '/game/scene': typeof GameSceneRoute
+  '/game': typeof GameIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/game/map': typeof GameMapRoute
+  '/game/pub': typeof GamePubRoute
+  '/game/scene': typeof GameSceneRoute
+  '/game/': typeof GameIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/game/map' | '/game/pub' | '/game/scene' | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/game/map' | '/game/pub' | '/game/scene' | '/game'
+  id: '__root__' | '/' | '/game/map' | '/game/pub' | '/game/scene' | '/game/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GameMapRoute: typeof GameMapRoute
+  GamePubRoute: typeof GamePubRoute
+  GameSceneRoute: typeof GameSceneRoute
+  GameIndexRoute: typeof GameIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GameMapRoute: GameMapRoute,
+  GamePubRoute: GamePubRoute,
+  GameSceneRoute: GameSceneRoute,
+  GameIndexRoute: GameIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +153,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/game/map",
+        "/game/pub",
+        "/game/scene",
+        "/game/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/game/map": {
+      "filePath": "game/map.tsx"
+    },
+    "/game/pub": {
+      "filePath": "game/pub.tsx"
+    },
+    "/game/scene": {
+      "filePath": "game/scene.tsx"
+    },
+    "/game/": {
+      "filePath": "game/index.tsx"
     }
   }
 }

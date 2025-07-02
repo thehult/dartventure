@@ -2,6 +2,7 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import ViteYaml from '@modyfi/vite-plugin-yaml'
 
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
@@ -11,6 +12,7 @@ export default defineConfig({
     TanStackRouterVite({ autoCodeSplitting: true }),
     viteReact(),
     tailwindcss(),
+    ViteYaml(),
   ],
   test: {
     globals: true,
