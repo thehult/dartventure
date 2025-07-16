@@ -4,21 +4,21 @@ import type { Scene } from '@/types/Scene'
 import { scenes, type SceneId } from '@/scenes/scenes'
 import { useSessionStorage } from 'usehooks-ts'
 
-type GameContext = {
+type SceneContext = {
   sceneId: SceneId
   scene: Scene
   navigateToScene: (sceneId: SceneId) => void
 }
 
-const GameContextImpl = createContext<GameContext>(null!)
+const SceneContextImpl = createContext<SceneContext>(null!)
 
-export const useGameContext = () => useContext(GameContextImpl)
+export const useScene = () => useContext(SceneContextImpl)
 
-type GameContextProviderProps = {
+type SceneContextProviderProps = {
   children?: React.ReactNode
 }
 
-export const GameContextProvider: React.FC<GameContextProviderProps> = ({
+export const SceneContextProvider: React.FC<SceneContextProviderProps> = ({
   children,
 }) => {
   const navigate = useNavigate()
@@ -27,12 +27,12 @@ export const GameContextProvider: React.FC<GameContextProviderProps> = ({
 
   const navigateToScene = (sceneId: SceneId) => {
     setSceneId(sceneId)
-    navigate({ to: '/game/scene' })
+    navigate({ to: '/game' })
   }
 
   return (
-    <GameContextImpl value={{ sceneId, scene, navigateToScene }}>
+    <SceneContextImpl value={{ sceneId, scene, navigateToScene }}>
       {children}
-    </GameContextImpl>
+    </SceneContextImpl>
   )
 }

@@ -1,10 +1,10 @@
-import { GameContextProvider } from '@/components/GameContext'
+import { SceneContextProvider } from '@/components/GameContext'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 
 export const Route = createRootRoute({
   component: () => (
-    <GameContextProvider>
+    <SceneContextProvider>
       <Outlet />
-    </GameContextProvider>
+    </SceneContextProvider>
   ),
 })

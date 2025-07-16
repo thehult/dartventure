@@ -22,6 +22,16 @@ type GameSaveV3 = {
   introducedGames: string[]
 }
 
+type GameSaveV4 = {
+  version: 4
+  playerName: string
+  money: number
+  reputation: number
+  completedStories: string[]
+  introducedGames: string[]
+  playerAverage: number
+}
+
 const migrations = {
   1: (original: GameSaveV1): GameSaveV2 => ({
     ...original,
@@ -33,10 +43,15 @@ const migrations = {
     version: 3,
     introducedGames: [],
   }),
+  3: (original: GameSaveV3): GameSaveV4 => ({
+    ...original,
+    version: 4,
+    playerAverage: 50,
+  }),
 }
 
-export type GameSaveVersions = GameSaveV1 | GameSaveV2 | GameSaveV3 // Should include all versions
-export type GameSave = GameSaveV3 // Should always be the latest version
+export type GameSaveVersions = GameSaveV1 | GameSaveV2 | GameSaveV3 | GameSaveV4 // Should include all versions
+export type GameSave = GameSaveV4 // Should always be the latest version
 
 export const migrateGameSave = (
   gameSave: GameSaveVersions,

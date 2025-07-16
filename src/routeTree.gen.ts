@@ -13,8 +13,6 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as GameIndexImport } from './routes/game/index'
-import { Route as GameSceneImport } from './routes/game/scene'
-import { Route as GamePubImport } from './routes/game/pub'
 import { Route as GameMatchImport } from './routes/game/match'
 import { Route as GameMapImport } from './routes/game/map'
 
@@ -29,18 +27,6 @@ const IndexRoute = IndexImport.update({
 const GameIndexRoute = GameIndexImport.update({
   id: '/game/',
   path: '/game/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const GameSceneRoute = GameSceneImport.update({
-  id: '/game/scene',
-  path: '/game/scene',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const GamePubRoute = GamePubImport.update({
-  id: '/game/pub',
-  path: '/game/pub',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,20 +67,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameMatchImport
       parentRoute: typeof rootRoute
     }
-    '/game/pub': {
-      id: '/game/pub'
-      path: '/game/pub'
-      fullPath: '/game/pub'
-      preLoaderRoute: typeof GamePubImport
-      parentRoute: typeof rootRoute
-    }
-    '/game/scene': {
-      id: '/game/scene'
-      path: '/game/scene'
-      fullPath: '/game/scene'
-      preLoaderRoute: typeof GameSceneImport
-      parentRoute: typeof rootRoute
-    }
     '/game/': {
       id: '/game/'
       path: '/game'
@@ -111,8 +83,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/game/map': typeof GameMapRoute
   '/game/match': typeof GameMatchRoute
-  '/game/pub': typeof GamePubRoute
-  '/game/scene': typeof GameSceneRoute
   '/game': typeof GameIndexRoute
 }
 
@@ -120,8 +90,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/game/map': typeof GameMapRoute
   '/game/match': typeof GameMatchRoute
-  '/game/pub': typeof GamePubRoute
-  '/game/scene': typeof GameSceneRoute
   '/game': typeof GameIndexRoute
 }
 
@@ -130,30 +98,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/game/map': typeof GameMapRoute
   '/game/match': typeof GameMatchRoute
-  '/game/pub': typeof GamePubRoute
-  '/game/scene': typeof GameSceneRoute
   '/game/': typeof GameIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/game/map'
-    | '/game/match'
-    | '/game/pub'
-    | '/game/scene'
-    | '/game'
+  fullPaths: '/' | '/game/map' | '/game/match' | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/game/map' | '/game/match' | '/game/pub' | '/game/scene' | '/game'
-  id:
-    | '__root__'
-    | '/'
-    | '/game/map'
-    | '/game/match'
-    | '/game/pub'
-    | '/game/scene'
-    | '/game/'
+  to: '/' | '/game/map' | '/game/match' | '/game'
+  id: '__root__' | '/' | '/game/map' | '/game/match' | '/game/'
   fileRoutesById: FileRoutesById
 }
 
@@ -161,8 +114,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GameMapRoute: typeof GameMapRoute
   GameMatchRoute: typeof GameMatchRoute
-  GamePubRoute: typeof GamePubRoute
-  GameSceneRoute: typeof GameSceneRoute
   GameIndexRoute: typeof GameIndexRoute
 }
 
@@ -170,8 +121,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GameMapRoute: GameMapRoute,
   GameMatchRoute: GameMatchRoute,
-  GamePubRoute: GamePubRoute,
-  GameSceneRoute: GameSceneRoute,
   GameIndexRoute: GameIndexRoute,
 }
 
@@ -188,8 +137,6 @@ export const routeTree = rootRoute
         "/",
         "/game/map",
         "/game/match",
-        "/game/pub",
-        "/game/scene",
         "/game/"
       ]
     },
@@ -201,12 +148,6 @@ export const routeTree = rootRoute
     },
     "/game/match": {
       "filePath": "game/match.tsx"
-    },
-    "/game/pub": {
-      "filePath": "game/pub.tsx"
-    },
-    "/game/scene": {
-      "filePath": "game/scene.tsx"
     },
     "/game/": {
       "filePath": "game/index.tsx"

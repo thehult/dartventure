@@ -1,27 +1,57 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { Background } from '@/components/Background'
+import { createFileRoute } from '@tanstack/react-router'
+import { Character } from '@/components/Character'
+import { Dialogue } from '@/components/Dialogue'
+
+import { useStory } from '@/components/useStory'
+import { useClickAnyWhere } from 'usehooks-ts'
+import { ActionMap } from '@/components/ActionMap'
+import StatBar from '@/components/StatBar'
+import { useScene } from '@/components/GameContext'
+import type { SceneId } from '@/scenes/scenes'
+
+export type SceneSearchParams = {
+  sceneId: SceneId
+}
 
 export const Route = createFileRoute('/game/')({
-  component: GameComponent,
+  component: SceneComponent,
 })
 
-function GameComponent() {
+function SceneComponent() {
+  const { scene } = useScene()
+  const { loaded, hasStory, currentCharacter, currentDialogue, advanceStory } =
+    useStory(scene)
+
+  useClickAnyWhere(() => {
+    advanceStory()
+  })
+
+  const characterEntered = () => {
+    advanceStory()
+  }
+
+  if (!loaded) {
+    return <div>Loading...</div>
+  }
+
   return (
-    <div>
-      Hello "/game/"!<br></br>
-      <Link to="/game/map">Go to Map</Link>
-      <br></br>
-      <Link to="/game/scene">Go to Scene</Link>
-      <br></br>
-      <Link
-        to="/game/match"
-        search={{
-          sceneId: 'pub',
-          gameId: 'x01',
-          parameters: { play_from: 301 },
-        }}
-      >
-        Go to Match
-      </Link>
-    </div>
+    <Background background={scene.background}>
+      <StatBar />
+      {Object.values(scene.characters).map((character) => (
+        <Character
+          key={character.name}
+          image={character.image}
+          visible={currentCharacter?.name === character.name}
+          onEntered={characterEntered}
+        />
+      ))}
+      {currentDialogue !== null && (
+        <Dialogue speaker={currentCharacter?.name} visible={true}>
+          {currentDialogue}
+        </Dialogue>
+      )}
+      {!hasStory && <ActionMap actions={scene.actions} />}
+    </Background>
   )
 }

@@ -1,5 +1,5 @@
-import type { SceneId } from '@/scenes/scenes'
-import type { Opponent } from './Opponent'
+import type { Requirement } from './Requirement'
+import type { Action } from './Actions'
 
 export interface Scene {
   background: Background
@@ -15,10 +15,6 @@ export type Character = {
   image: string
 }
 
-type RequirementReputation = { reputation: number }
-type RequirementStory = { story: string }
-export type Requirement = RequirementReputation | RequirementStory
-
 type ScriptCharacter = { character: string }
 type ScriptDialogue = { dialogue: string }
 export type ScriptAction = ScriptCharacter | ScriptDialogue
@@ -28,29 +24,3 @@ export type Story = {
   requirements?: Requirement[]
   script: ScriptAction[]
 }
-
-type ActionBase = {
-  name: string
-  icon: string
-  description: string
-  unlocked_by?: string
-  requirements?: Requirement[]
-}
-type ActionMatch = ActionBase & {
-  action: 'match'
-  gameId: string
-  gameParameters?: { [key: string]: any }
-  opponent: Opponent
-  reward?: { money?: number; reputation?: number }
-  penalty?: { money?: number; reputation?: number }
-}
-type ActionTournament = ActionBase & {
-  action: 'tournament'
-  gameId: string
-  gameParameters?: { [key: string]: any }
-}
-type ActionNavigate = ActionBase & {
-  action: 'navigate'
-  sceneId: SceneId
-}
-export type Action = ActionMatch | ActionTournament | ActionNavigate

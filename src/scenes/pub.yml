@@ -12,36 +12,25 @@ actions:
     description: Play a game of darts with a regular.
     action: match
     gameId: x01
-    gameParameters:
+    gameOptions:
       startScore: 301
+      doubleOut: true
     opponent:
-      skill: 0.2
+      average: +20
     reward:
       reputation: 5
     penalty:
       reputation: -5
   - name: Pub tournament
-    icon: /logo512.png
+    icon: /game_assets/scenes/pub/bartender.png
     description: Play in the pub tournament.
     unlocked_by: pub-tournament-invite
     requirements:
       - reputation: 10
     action: tournament
     gameId: x01
-    gameParameters:
+    gameOptions:
       startScore: 301
-  # - name: Pub tournament
-  #   icon: /logo512.png
-  #   description: Play in the pub tournament.
-  #   action: tournament
-  # - name: Pub tournament
-  #   icon: /logo512.png
-  #   description: Play in the pub tournament.
-  #   action: tournament
-  # - name: Pub tournament
-  #   icon: /logo512.png
-  #   description: Play in the pub tournament.
-  #   action: tournament
 stories:
   - name: welcome
     script:

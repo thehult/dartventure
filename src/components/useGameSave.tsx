@@ -3,7 +3,7 @@ import {
   type GameSave,
   type GameSaveVersions,
 } from '@/types/GameSave'
-import type { Requirement } from '@/types/Scene'
+import type { Requirement } from '@/types/Requirement'
 import { useEffect } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
@@ -35,13 +35,13 @@ export const useGameSave = (saveName: string = 'gameSave') => {
   const addMoney = (amount: number) => {
     setGameSave((prev) => ({
       ...prev,
-      money: prev.money + amount,
+      money: Math.max(prev.money + amount, 0),
     }))
   }
   const addReputation = (amount: number) => {
     setGameSave((prev) => ({
       ...prev,
-      reputation: prev.reputation + amount,
+      reputation: Math.max(prev.reputation + amount, 0),
     }))
   }
   const completeStory = (storyName: string) => {

@@ -1,8 +1,8 @@
-import type { Action } from '@/types/Scene'
 import React from 'react'
 import { useGameSave } from './useGameSave'
 import { useNavigate } from '@tanstack/react-router'
-import { useGameContext } from './GameContext'
+import { useScene } from './GameContext'
+import type { Action } from '@/types/Actions'
 
 type ActionMapProps = {
   actions: Action[]
@@ -24,7 +24,7 @@ type ActionIconProps = {
 const ActionIcon: React.FC<ActionIconProps> = ({ action }) => {
   const gameSave = useGameSave()
   const navigate = useNavigate()
-  const gameContext = useGameContext()
+  const { navigateToScene } = useScene()
 
   // Check if all requirements are met
   const requirementsMet = gameSave.validateRequirements(action.requirements)
@@ -37,15 +37,19 @@ const ActionIcon: React.FC<ActionIconProps> = ({ action }) => {
 
   const handleClick = () => {
     if (action.action === 'match') {
+      console.log('Match action', action)
       navigate({
         to: '/game/match',
         search: {
           gameId: action.gameId,
-          parameters: action.gameParameters,
+          opponent: action.opponent,
+          options: action.gameOptions,
+          reward: action.reward,
+          penalty: action.penalty,
         },
       })
     } else if (action.action === 'navigate') {
-      gameContext.navigateToScene(action.sceneId)
+      navigateToScene(action.sceneId)
     }
   }
 
