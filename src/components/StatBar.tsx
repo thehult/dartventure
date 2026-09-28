@@ -1,5 +1,5 @@
 import React from 'react'
-import { useGameSave } from './useGameSave'
+import { useGameSave } from '../hooks/useGameSave'
 
 const reputationHack = import.meta.env.MODE === 'development' ? 5 : 0
 const moneyHack = import.meta.env.MODE === 'development' ? 100 : 0

@@ -3,12 +3,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Character } from '@/components/Character'
 import { Dialogue } from '@/components/Dialogue'
 
-import { useStory } from '@/components/useStory'
+import { useStory } from '@/hooks/useStory'
 import { useClickAnyWhere } from 'usehooks-ts'
 import { ActionMap } from '@/components/ActionMap'
 import StatBar from '@/components/StatBar'
-import { useScene } from '@/components/GameContext'
 import type { SceneId } from '@/scenes/scenes'
+import { useScene } from '@/hooks/useScene'
 
 export type SceneSearchParams = {
   sceneId: SceneId

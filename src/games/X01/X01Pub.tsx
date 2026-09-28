@@ -53,28 +53,31 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
       scores[previousPlayer].push(turn)
       previousPlayer = history[i].currentPlayer
     }
-    console.log('Chalkboard', scores)
     return scores
   }, [history])
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full">
       <div className="flex flex-row justify-start items-start w-full md:w-2/3 xl:w-1/2 h-5/8 bg-neutral-950 border-double border-white border-1 overflow-y-scroll">
-        {players.map((player) => (
+        {players.map((player, pidx) => (
           <div
             className="flex flex-col items-center justify-start w-full h-full text-4xl text-neutral-50 pt-2 pb-2 font-[Kalam]"
             key={player.id}
           >
             <span className="text-lg mt-0">{player.name}</span>
-            <div className="flex flex-col  items-center  w-full px-8 ">
+            <div className="flex flex-col items-center  w-full px-8 ">
               {chalkboard[player.id].map((s, i, a) => (
                 <div
-                  className="flex flex-row w-full"
+                  className={`flex w-full items-end ${pidx % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
                   key={`history-${player.id}-${i}`}
                 >
-                  <span className={`w-1/2 text-left`}>{s.hit ?? ' '}</span>
                   <span
-                    className={`w-1/2 text-center ${i < a.length - 1 ? 'line-through' : ''}`}
+                    className={`w-1/2  text-3xl ${pidx % 2 === 0 ? 'text-left' : 'text-right'}`}
+                  >
+                    {s.hit ?? ' '}
+                  </span>
+                  <span
+                    className={`w-1/2 font-bold text-4xl text-center ${i < a.length - 1 ? 'line-through' : ''}`}
                     key={`history-score-${player.id}-${i}`}
                   >
                     {s.score}
@@ -82,7 +85,12 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
                 </div>
               ))}
               {player.id === state.currentPlayer && (
-                <span className="w-full text-left">{input}</span>
+                <div className="flex flex-row w-full items-end">
+                  <span className="w-full text-left text-3xl pt-1">
+                    {input}
+                  </span>
+                  <span className="w-full text-left text-4xl"></span>
+                </div>
               )}
             </div>
             {/* <span

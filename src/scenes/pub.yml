@@ -11,12 +11,12 @@ actions:
     icon: /game_assets/scenes/pub/drinker.png
     description: Play a game of darts with a regular.
     action: match
-    gameId: x01
-    gameOptions:
-      startScore: 301
-      doubleOut: true
-    opponent:
-      average: +20
+    options:
+      average: -20
+      gameId: x01
+      gameOptions:
+        startScore: 301
+        doubleOut: true
     reward:
       reputation: 5
     penalty:
@@ -28,9 +28,17 @@ actions:
     requirements:
       - reputation: 10
     action: tournament
-    gameId: x01
-    gameOptions:
-      startScore: 301
+    options:
+      players: 8
+      average: -10
+      gameId: x01
+      gameOptions:
+        startScore: 301
+        doubleOut: true
+    reward:
+      reputation: 5
+    penalty:
+      reputation: -5
 stories:
   - name: welcome
     script:

@@ -25,8 +25,8 @@ const INPUT_BUTTONS: Key[] = [
   '7',
   '8',
   '9',
-  '0',
   'undo',
+  '0',
   'enter',
 ]
 

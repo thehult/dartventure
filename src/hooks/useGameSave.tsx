@@ -4,8 +4,9 @@ import {
   type GameSaveVersions,
 } from '@/types/GameSave'
 import type { Requirement } from '@/types/Requirement'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { useLocalStorage } from 'usehooks-ts'
+import { useLocalStorage, useSessionStorage } from 'usehooks-ts'
 
 const defaultGameSave: GameSaveVersions = {
   // const [gameSave, setGameSave] = useState<GameSave>({
@@ -15,9 +16,21 @@ const defaultGameSave: GameSaveVersions = {
   completedStories: [],
 }
 
-export const useGameSave = (saveName: string = 'gameSave') => {
+export function useCurrentGameSave() {
+  const [currentGameSave, setCurrentGameSave] = useSessionStorage<
+    string | null
+  >('currentGameSave', null)
+
+  return { currentGameSave, setCurrentGameSave }
+}
+
+export const useGameSave = (saveName?: string) => {
+  const { currentGameSave } = useCurrentGameSave()
+  const navigate = useNavigate()
+  if (!currentGameSave) navigate({ to: '/' })
+
   const [gameSave, setGameSave] = useLocalStorage<GameSaveVersions>(
-    saveName,
+    `gamesaves/${currentGameSave}`,
     defaultGameSave,
   )
   const [_, setBackup] = useLocalStorage<GameSaveVersions | undefined>(

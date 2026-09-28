@@ -8,6 +8,23 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   touch-action: manipulation;
+
+  --primary-color: #e3ab2f;
+  --secondary-color: #925c1a;
+  --dark-color: #321e0a;
+  --alternative-color: #4c4323
+  /*
+#e3ab2f
+#925c1a
+#321e0a
+#656134
+#653f0f
+#99886f
+#a99878
+#4c4323
+#63523c
+#ba4414
+  */
 }
 
 code {

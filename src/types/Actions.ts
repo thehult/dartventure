@@ -1,13 +1,9 @@
 import type { SceneId } from '@/scenes/scenes'
 import type { Requirement } from './Requirement'
+import type { TournamentOptions } from './Tournament'
+import type { MatchOptions } from './Match'
 
 export type GameId = 'x01'
-
-export interface Opponent {
-  name?: string
-  average: number
-  strategy?: string
-}
 
 export interface Outcome {
   money?: number
@@ -23,16 +19,15 @@ type ActionBase = {
 }
 type ActionMatch = ActionBase & {
   action: 'match'
-  gameId: GameId
-  gameOptions?: { [key: string]: any }
-  opponent: Opponent
+  options: MatchOptions
   reward?: Outcome
   penalty?: Outcome
 }
 type ActionTournament = ActionBase & {
   action: 'tournament'
-  gameId: GameId
-  gameOptions?: { [key: string]: any }
+  reward?: Outcome
+  penalty?: Outcome
+  options: TournamentOptions
 }
 type ActionNavigate = ActionBase & {
   action: 'navigate'

@@ -1,4 +1,4 @@
-import { usePreload } from './usePreload'
+import { usePreload } from '../hooks/usePreload'
 
 const enterDuration = 1000
 

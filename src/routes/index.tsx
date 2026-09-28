@@ -1,39 +1,32 @@
 import { createFileRoute } from '@tanstack/react-router'
-import logo from '../logo.svg'
+import { Background } from '@/components/Background'
+import { useGameSaves } from '@/hooks/useGameSaves'
+import { Menu, MenuButton, MenuImage } from '@/components/Menu'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
 function App() {
+  const { gameSaves, createGameSave, loadGameSave } = useGameSaves()
+
+  const handleNewGame = () => {
+    createGameSave('test123')
+  }
+
+  const handleContinueGame = () => {
+    loadGameSave(gameSaves[0].id)
+  }
+
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
+    <Background background="/game_assets/scenes/pub/background.png">
+      <Menu>
+        <MenuImage image="/logo512.png" />
+        <MenuButton visible={gameSaves.length > 0} onClick={handleContinueGame}>
+          Continue Game
+        </MenuButton>
+        <MenuButton onClick={handleNewGame}>New Game</MenuButton>
+      </Menu>
+    </Background>
   )
 }

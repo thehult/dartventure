@@ -1,8 +1,7 @@
 import React from 'react'
-import { useGameSave } from './useGameSave'
-import { useNavigate } from '@tanstack/react-router'
-import { useScene } from './GameContext'
+import { useGameSave } from '../hooks/useGameSave'
 import type { Action } from '@/types/Actions'
+import { useGameFlow } from '@/hooks/useGameFlow'
 
 type ActionMapProps = {
   actions: Action[]
@@ -23,8 +22,7 @@ type ActionIconProps = {
 
 const ActionIcon: React.FC<ActionIconProps> = ({ action }) => {
   const gameSave = useGameSave()
-  const navigate = useNavigate()
-  const { navigateToScene } = useScene()
+  const { goToScene, createMatch, createTournament } = useGameFlow()
 
   // Check if all requirements are met
   const requirementsMet = gameSave.validateRequirements(action.requirements)
@@ -38,18 +36,19 @@ const ActionIcon: React.FC<ActionIconProps> = ({ action }) => {
   const handleClick = () => {
     if (action.action === 'match') {
       console.log('Match action', action)
-      navigate({
-        to: '/game/match',
-        search: {
-          gameId: action.gameId,
-          opponent: action.opponent,
-          options: action.gameOptions,
-          reward: action.reward,
-          penalty: action.penalty,
-        },
+      createMatch({
+        ...action.options,
+        reward: action.reward,
+        penalty: action.penalty,
       })
     } else if (action.action === 'navigate') {
-      navigateToScene(action.sceneId)
+      goToScene(action.sceneId)
+    } else if (action.action === 'tournament') {
+      createTournament({
+        ...action.options,
+        reward: action.reward,
+        penalty: action.penalty,
+      })
     }
   }
 

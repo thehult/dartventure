@@ -1,29 +1,22 @@
 'use strict'
 
 import { Background } from '@/components/Background'
-import { useScene } from '@/components/GameContext'
 import { createFileRoute, type ReactNode } from '@tanstack/react-router'
 import { GameBot, GameProvider } from '@dartgames/react'
-import { X01, X01BasicStrategy, type X01Options } from '@dartgames/games'
 import X01Pub from '@/games/X01/X01Pub'
 import type { SceneId } from '@/scenes/scenes'
-import { useMemo, useState } from 'react'
-import {
-  Field,
-  type IGame,
-  type IGameStrategy,
-  type IPlayer,
-} from '@dartgames/core'
-import { type GameComponent } from '@/games/GameComponent'
-import type { DartPlayer } from '@/types/Player'
-import { useGameSave } from '@/components/useGameSave'
-import { randomMaleName } from '@/util/names'
-import type { GameId, Opponent, Outcome } from '@/types/Actions'
+import { useMemo, useRef, useState } from 'react'
+import { Field, type IPlayer } from '@dartgames/core'
+import type { Opponent } from '@/types/Player'
+import { useGameSave } from '@/hooks/useGameSave'
+import type { GameId, Outcome } from '@/types/Actions'
 import { Dialogue } from '@/components/Dialogue'
 import ClickAnywhere from '@/components/ClickAnywhere'
-
-const PLAYER_ID = 'player'
-const OPPONENT_ID = 'opponent'
+import { useScene } from '@/hooks/useScene'
+import { useGameFlow } from '@/hooks/useGameFlow'
+import { OPPONENT_ID, PLAYER_ID, useMatch } from '@/hooks/useMatch'
+import { createGameStrategy } from '@/util/games'
+import { useDartGame } from '@/hooks/useDartGame'
 
 const gameComponents: Record<GameId, Record<SceneId, ReactNode>> = {
   x01: {
@@ -31,26 +24,8 @@ const gameComponents: Record<GameId, Record<SceneId, ReactNode>> = {
     world: X01Pub,
   },
 }
-
-type MatchOptions = {
-  gameId: GameId
-  opponent: Opponent
-  options?: Record<string, any>
-  reward?: Outcome
-  penalty?: Outcome
-}
-
 export const Route = createFileRoute('/game/match')({
   component: MatchComponent,
-  validateSearch: (search): MatchOptions => {
-    return {
-      gameId: (search.gameId as GameId) ?? 'error',
-      opponent: search.opponent as Opponent,
-      options: (search.options as Record<string, any>) ?? {},
-      reward: search.reward as Outcome,
-      penalty: search.penalty as Outcome,
-    }
-  },
 })
 
 function MatchComponent() {
@@ -58,46 +33,18 @@ function MatchComponent() {
     'running',
   )
 
-  const { playerName, playerAverage, addMoney, addReputation } = useGameSave()
-  const { gameId, opponent, options, reward, penalty } = Route.useSearch()
-  const { scene, sceneId, navigateToScene } = useScene()
-  const players = useMemo<DartPlayer[]>(
-    () => [
-      {
-        id: PLAYER_ID,
-        name: playerName,
-      },
-      {
-        id: OPPONENT_ID,
-        name: opponent.name ?? randomMaleName(),
-      },
-    ],
-    [opponent],
-  )
+  const { scene, sceneId } = useScene()
+  const { addMoney, addReputation } = useGameSave()
+  const { match, gameId, initialGameData, players, saveGameData } = useMatch()
+  const { goToScene } = useGameFlow()
 
-  const opponentAverage = Math.max(
-    15,
-    Math.min(110, playerAverage + opponent.average),
-  )
+  const opponent = useMemo(() => {
+    return players.find((p) => p.id !== PLAYER_ID) as Opponent
+  }, [players])
 
-  const game = useMemo<IGame>(() => {
-    switch (gameId) {
-      case 'x01':
-        return new X01(players, options as X01Options)
-    }
-  }, [gameId])
-
-  const gameStrategy = useMemo<IGameStrategy<any>>(() => {
-    switch (gameId) {
-      case 'x01':
-        return new X01BasicStrategy()
-    }
-  }, [gameId])
-
-  const GameComponent = useMemo<GameComponent>(
-    () => gameComponents[gameId][sceneId],
-    [gameId, sceneId],
-  )
+  const GameComponent = gameComponents[gameId][sceneId]
+  const game = useDartGame(gameId, players, match.gameOptions, initialGameData)
+  const gameStrategy = useRef(createGameStrategy(gameId))
 
   const handleBotHit = (hit: Field) => {
     console.log('Bot hit', hit)
@@ -106,27 +53,37 @@ function MatchComponent() {
   const handleGameOver = (winners: IPlayer[]) => {
     if (winners.some((p) => p.id === PLAYER_ID)) {
       setMatchState('won')
-      addMoney(reward?.money ?? 0)
-      addReputation(reward?.reputation ?? 0)
+      addMoney(match.reward?.money ?? 0)
+      addReputation(match.reward?.reputation ?? 0)
     } else {
       setMatchState('lost')
-      addMoney(penalty?.money ?? 0)
-      addReputation(penalty?.reputation ?? 0)
+      addMoney(match.penalty?.money ?? 0)
+      addReputation(match.penalty?.reputation ?? 0)
     }
   }
 
-  const handleNavigateBack = () => {
-    navigateToScene(sceneId)
+  const handleStateChange = (gameState: any) => {
+    saveGameData(gameState)
   }
+
+  const handleNavigateBack = () => {
+    goToScene(sceneId)
+  }
+
+  console.log(game)
 
   return (
     <Background background={scene.background}>
-      <GameProvider game={game} onGameOver={handleGameOver}>
+      <GameProvider
+        game={game}
+        onStateChange={handleStateChange}
+        onGameOver={handleGameOver}
+      >
         {/* @ts-ignore */}
         <GameBot
           playerId={OPPONENT_ID}
-          average={opponentAverage}
-          strategy={gameStrategy}
+          average={opponent?.average ?? 50}
+          strategy={gameStrategy.current}
           delay={20}
           onHit={handleBotHit}
         />
@@ -137,14 +94,14 @@ function MatchComponent() {
       {matchState === 'won' && (
         <ClickAnywhere onClick={handleNavigateBack}>
           <Dialogue visible={true} speaker="You won!">
-            {createOutcomeString(reward)}
+            {createOutcomeString(match.reward)}
           </Dialogue>
         </ClickAnywhere>
       )}
       {matchState === 'lost' && (
         <ClickAnywhere onClick={handleNavigateBack}>
           <Dialogue visible={true} speaker="You lost!">
-            {createOutcomeString(penalty)}
+            {createOutcomeString(match.penalty)}
           </Dialogue>
         </ClickAnywhere>
       )}
