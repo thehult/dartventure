@@ -1,4 +1,4 @@
-import { DEFAULT_DIFFICULTY } from './difficulty'
+import { DEFAULT_DIFFICULTY, DIFFICULTIES } from './difficulty'
 import type { Difficulty } from './difficulty'
 import type { GameState } from '@/types/GameState'
 
@@ -60,25 +60,33 @@ export const migrateSave = (save: AnySave): GameState => {
   return save
 }
 
+/**
+ * A new game. The player's average starts at the difficulty's starting
+ * average unless given, and adjusts to their real level as they play.
+ */
 export const createGameState = (
   playerName: string,
   options: { difficulty?: Difficulty; playerAverage?: number } = {},
-): GameState => ({
-  version: CURRENT_VERSION,
-  playerName,
-  difficulty: options.difficulty ?? DEFAULT_DIFFICULTY,
-  money: 0,
-  reputation: 0,
-  playerAverage: options.playerAverage ?? DEFAULT_PLAYER_AVERAGE,
-  completedStories: [],
-  introducedGames: [],
-  flags: {},
-  stats: {
-    matchesPlayed: 0,
-    matchesWon: 0,
-    tournamentsPlayed: 0,
-    tournamentsWon: 0,
-  },
-  location: START_LOCATION,
-  activity: null,
-})
+): GameState => {
+  const difficulty = options.difficulty ?? DEFAULT_DIFFICULTY
+  return {
+    version: CURRENT_VERSION,
+    playerName,
+    difficulty,
+    money: 0,
+    reputation: 0,
+    playerAverage:
+      options.playerAverage ?? DIFFICULTIES[difficulty].startingAverage,
+    completedStories: [],
+    introducedGames: [],
+    flags: {},
+    stats: {
+      matchesPlayed: 0,
+      matchesWon: 0,
+      tournamentsPlayed: 0,
+      tournamentsWon: 0,
+    },
+    location: START_LOCATION,
+    activity: null,
+  }
+}

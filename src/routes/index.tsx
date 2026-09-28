@@ -8,9 +8,7 @@ import {
   DIFFICULTIES,
   DIFFICULTY_ORDER,
 } from '@/engine/difficulty'
-import { DEFAULT_PLAYER_AVERAGE } from '@/engine/save'
 import { createSave, listSaves, openSave } from '@/state/store'
-import { MAX_AVERAGE, MIN_AVERAGE, clampAverage } from '@/types/Player'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -24,7 +22,6 @@ function App() {
   const [saves] = useState(listSaves)
   const [naming, setNaming] = useState(false)
   const [name, setName] = useState('')
-  const [average, setAverage] = useState(String(DEFAULT_PLAYER_AVERAGE))
   const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_DIFFICULTY)
 
   const handleContinueGame = () => {
@@ -33,13 +30,7 @@ function App() {
 
   const handleStartGame = (event: React.FormEvent) => {
     event.preventDefault()
-    const parsed = Number(average)
-    createSave(name.trim() || 'Player', {
-      difficulty,
-      playerAverage: Number.isFinite(parsed)
-        ? clampAverage(parsed)
-        : DEFAULT_PLAYER_AVERAGE,
-    })
+    createSave(name.trim() || 'Player', { difficulty })
     navigate({ to: '/game' })
   }
 
@@ -60,22 +51,6 @@ function App() {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <label className={`${panelClass} flex items-center gap-4 py-3 px-4`}>
-              <span className="flex-grow">
-                Your three-dart average, roughly
-                <span className="block text-sm text-white/70">
-                  Opponents are matched to it. It updates as you play.
-                </span>
-              </span>
-              <input
-                type="number"
-                min={MIN_AVERAGE}
-                max={MAX_AVERAGE}
-                className="w-20 py-2 px-2 bg-black/70 text-xl text-right border-1 border-white/50"
-                value={average}
-                onChange={(e) => setAverage(e.target.value)}
-              />
-            </label>
             <fieldset className={`${panelClass} py-3 px-4`}>
               <legend className="px-1">Difficulty</legend>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

@@ -3,7 +3,6 @@ import type { IGame, IGameData } from '@dartgames/core'
 import type { Action } from '@/types/Scene'
 import type { MatchResult } from '@/types/Match'
 import type { Outcome } from '@/types/Outcome'
-import type { Difficulty } from '@/engine/difficulty'
 import { applyOutcome } from '@/engine/outcome'
 import * as flow from '@/engine/flow'
 
@@ -18,8 +17,6 @@ export const actions = {
     update((s) => flow.resolveMatch(s, result)),
   startTournamentMatch: () => update(flow.startTournamentMatch),
   leaveTournament: () => update(flow.leaveTournament),
-  setDifficulty: (difficulty: Difficulty) =>
-    update((s) => flow.setDifficulty(s, difficulty)),
   /** Development cheat. */
   give: (outcome: Outcome) =>
     update((s) => flow.settle(applyOutcome(s, outcome))),

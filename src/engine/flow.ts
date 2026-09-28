@@ -28,7 +28,6 @@ import {
 import type { IGame, IGameData } from '@dartgames/core'
 import type { GameState } from '@/types/GameState'
 import type { TournamentActivity } from '@/types/Activity'
-import type { Difficulty } from './difficulty'
 import type { Action } from '@/types/Scene'
 import type { ActiveMatch, MatchResult } from '@/types/Match'
 import type { BotPlayer } from '@/types/Player'
@@ -133,12 +132,6 @@ export const performAction = (state: GameState, action: Action): GameState => {
     }
   }
 }
-
-/** Applies to matches started from now on. */
-export const setDifficulty = (
-  state: GameState,
-  difficulty: Difficulty,
-): GameState => ({ ...state, difficulty })
 
 export const advanceStory = (state: GameState, choice?: number): GameState => {
   const activity = state.activity

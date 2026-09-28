@@ -47,6 +47,16 @@ describe('migrateSave', () => {
 })
 
 describe('createGameState', () => {
+  it('starts at the starting average of the difficulty', () => {
+    expect(createGameState('Phil', { difficulty: 'easy' }).playerAverage).toBe(
+      30,
+    )
+    expect(createGameState('Phil').playerAverage).toBe(50)
+    expect(createGameState('Phil', { difficulty: 'pro' }).playerAverage).toBe(
+      80,
+    )
+  })
+
   it('starts with the chosen difficulty and average', () => {
     const state = createGameState('Phil', {
       difficulty: 'easy',
