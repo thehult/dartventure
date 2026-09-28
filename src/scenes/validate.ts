@@ -63,6 +63,11 @@ export const validateScenes = (
       }
     }
   }
+  const checkAmount = (where: string, value: unknown) => {
+    if (value !== undefined && (typeof value !== 'number' || value < 0)) {
+      errors.push(`${where}: expected a number of at least 0`)
+    }
+  }
   const checkGame = (where: string, gameId: unknown) => {
     if (typeof gameId !== 'string' || !gameIds.includes(gameId)) {
       errors.push(
@@ -79,6 +84,7 @@ export const validateScenes = (
     if (options.opponent !== undefined && !isRecord(options.opponent)) {
       errors.push(`${where}.opponent: expected an object`)
     }
+    checkAmount(`${where}.opponent.minAverage`, options.opponent?.minAverage)
   }
 
   for (const [sceneId, scene] of Object.entries(scenes)) {
@@ -112,6 +118,7 @@ export const validateScenes = (
           break
         case 'match':
           checkMatchOptions(`${where}.options`, action.options)
+          checkAmount(`${where}.entryFee`, action.entryFee)
           checkOutcome(`${where}.reward`, action.reward)
           checkOutcome(`${where}.penalty`, action.penalty)
           break
@@ -122,6 +129,9 @@ export const validateScenes = (
               `${where}.options.players: must be a power of two, got ${action.options.players}`,
             )
           }
+          checkAmount(`${where}.entryFee`, action.entryFee)
+          checkAmount(`${where}.options.minAverage`, action.options.minAverage)
+          checkOutcome(`${where}.roundReward`, action.roundReward)
           checkOutcome(`${where}.reward`, action.reward)
           checkOutcome(`${where}.penalty`, action.penalty)
           break

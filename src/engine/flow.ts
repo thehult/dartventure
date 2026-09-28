@@ -4,7 +4,12 @@
  * Which screen is shown follows from `state.activity`.
  */
 import { evaluate } from './conditions'
-import { applyOutcome, formatOutcome } from './outcome'
+import {
+  applyOutcome,
+  combineOutcomes,
+  formatOutcome,
+  scaleOutcome,
+} from './outcome'
 import { createActiveMatch, recordMatch } from './match'
 import { advanceScript, runScript } from './story'
 import { simulateMatch } from './simulate'
@@ -16,11 +21,13 @@ import {
   isFinished,
   nextPlayerMatch,
   playerStatus,
+  playerWins,
   recordResult,
   simulateBotMatches,
 } from './tournament'
 import type { IGame, IGameData } from '@dartgames/core'
 import type { GameState } from '@/types/GameState'
+import type { TournamentActivity } from '@/types/Activity'
 import type { Action } from '@/types/Scene'
 import type { ActiveMatch, MatchResult } from '@/types/Match'
 import type { BotPlayer } from '@/types/Player'
@@ -69,8 +76,14 @@ export const repair = (state: GameState): GameState => {
 export const isActionVisible = (action: Action, state: GameState) =>
   evaluate(action.visible, state)
 
+export const entryFee = (action: Action) =>
+  action.action === 'navigate' ? 0 : (action.entryFee ?? 0)
+
+export const canAfford = (action: Action, state: GameState) =>
+  state.money >= entryFee(action)
+
 export const isActionEnabled = (action: Action, state: GameState) =>
-  evaluate(action.enabled, state)
+  evaluate(action.enabled, state) && canAfford(action, state)
 
 export const performAction = (state: GameState, action: Action): GameState => {
   if (state.activity !== null) return state
@@ -78,6 +91,7 @@ export const performAction = (state: GameState, action: Action): GameState => {
     return state
   }
 
+  state = { ...state, money: state.money - entryFee(action) }
   switch (action.action) {
     case 'navigate':
       return settle({ ...state, location: action.sceneId })
@@ -109,6 +123,7 @@ export const performAction = (state: GameState, action: Action): GameState => {
         activity: {
           type: 'tournament',
           tournament: simulateBotMatches(tournament, simulateMatch),
+          roundReward: action.roundReward,
           reward: action.reward,
           penalty: action.penalty,
         },
@@ -241,15 +256,25 @@ export const resolveMatch = (
   return settle({ ...state, activity: null })
 }
 
+/** What the player gets for their tournament run if they leave now. */
+const tournamentOutcome = (activity: TournamentActivity) => {
+  const champion = playerStatus(activity.tournament) === 'champion'
+  return combineOutcomes(
+    scaleOutcome(activity.roundReward, playerWins(activity.tournament)),
+    champion ? activity.reward : activity.penalty,
+  )
+}
+
 /**
- * Leaves the tournament. Winning it gives the reward; being eliminated or
- * withdrawing early gives the penalty.
+ * Leaves the tournament. The player gets the round reward for every match
+ * they won, plus the reward for winning it or the penalty for being
+ * eliminated or withdrawing early.
  */
 export const leaveTournament = (state: GameState): GameState => {
   const activity = state.activity
   if (activity?.type !== 'tournament' || activity.match) return state
   const champion = playerStatus(activity.tournament) === 'champion'
-  state = applyOutcome(state, champion ? activity.reward : activity.penalty)
+  state = applyOutcome(state, tournamentOutcome(activity))
   if (champion) {
     state = {
       ...state,
@@ -279,6 +304,6 @@ export const tournamentSummary = (state: GameState) => {
     finished,
     champion,
     nextOpponent: opponentId ? getPlayer(tournament, opponentId) : undefined,
-    outcome: status === 'champion' ? activity.reward : activity.penalty,
+    outcome: tournamentOutcome(activity),
   }
 }

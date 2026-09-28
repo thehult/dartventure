@@ -24,6 +24,7 @@ export type TournamentActivity = {
   tournament: Tournament
   /** The player's match currently being played. */
   match?: ActiveMatch
+  roundReward?: Outcome
   reward?: Outcome
   penalty?: Outcome
 }

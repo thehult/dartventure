@@ -6,7 +6,14 @@ import { gameIds } from '@/games/registry'
 
 describe('scene content', () => {
   it('loads every scene', () => {
-    expect(Object.keys(scenes).sort()).toEqual(['pub', 'world'])
+    expect(Object.keys(scenes).sort()).toEqual([
+      'club',
+      'district',
+      'nationals',
+      'pub',
+      'world',
+      'worlds',
+    ])
   })
 
   it('has no errors', () => {

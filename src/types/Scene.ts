@@ -35,6 +35,8 @@ type ActionBase = {
 export type MatchAction = ActionBase & {
   action: 'match'
   options: MatchOptions
+  /** Money paid to play. The action is disabled if the player can't pay. */
+  entryFee?: number
   reward?: Outcome
   penalty?: Outcome
 }
@@ -42,6 +44,10 @@ export type MatchAction = ActionBase & {
 export type TournamentAction = ActionBase & {
   action: 'tournament'
   options: TournamentOptions
+  /** Money paid to enter. The action is disabled if the player can't pay. */
+  entryFee?: number
+  /** Applied once for every match the player wins. */
+  roundReward?: Outcome
   /** Applied when the player wins the tournament. */
   reward?: Outcome
   /** Applied when the player is eliminated or withdraws. */

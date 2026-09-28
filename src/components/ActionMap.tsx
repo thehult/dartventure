@@ -1,7 +1,12 @@
 import React from 'react'
 import type { Action } from '@/types/Scene'
 import type { GameState } from '@/types/GameState'
-import { isActionEnabled, isActionVisible } from '@/engine/flow'
+import {
+  canAfford,
+  entryFee,
+  isActionEnabled,
+  isActionVisible,
+} from '@/engine/flow'
 import { actions } from '@/state/actions'
 
 type ActionMapProps = {
@@ -22,6 +27,7 @@ export const ActionMap: React.FC<ActionMapProps> = ({
             key={idx}
             action={action}
             enabled={isActionEnabled(action, state)}
+            affordable={canAfford(action, state)}
           />
         ))}
     </div>
@@ -31,9 +37,16 @@ export const ActionMap: React.FC<ActionMapProps> = ({
 type ActionIconProps = {
   action: Action
   enabled: boolean
+  affordable: boolean
 }
 
-const ActionIcon: React.FC<ActionIconProps> = ({ action, enabled }) => {
+const ActionIcon: React.FC<ActionIconProps> = ({
+  action,
+  enabled,
+  affordable,
+}) => {
+  const fee = entryFee(action)
+  const hint = affordable ? action.hint : `You need $${fee} to enter`
   return (
     <button
       className="flex flex-col items-start justify-center w-32"
@@ -42,7 +55,7 @@ const ActionIcon: React.FC<ActionIconProps> = ({ action, enabled }) => {
         filter: enabled ? 'none' : 'grayscale(100%)',
         cursor: enabled ? 'pointer' : 'not-allowed',
       }}
-      title={enabled ? action.description : (action.hint ?? action.description)}
+      title={enabled ? action.description : (hint ?? action.description)}
       disabled={!enabled}
       onClick={() => actions.perform(action)}
     >
@@ -55,12 +68,17 @@ const ActionIcon: React.FC<ActionIconProps> = ({ action, enabled }) => {
           className="absolute d-flex w-32 h-32 bg-[image:var(--image-url)] bg-cover bg-top"
         ></div>
       </div>
-      <span className="flex justify-center text-center text-md text-white break-keep whitespace-nowrap w-full">
+      <span className="flex justify-center text-center text-md text-white break-keep whitespace-nowrap w-full [text-shadow:0_1px_3px_black]">
         {action.name}
       </span>
-      {!enabled && action.hint && (
-        <span className="flex justify-center text-center text-sm text-white/80 w-full">
-          {action.hint}
+      {fee > 0 && (
+        <span className="flex justify-center text-center text-sm text-white/80 w-full [text-shadow:0_1px_3px_black]">
+          Entry ${fee}
+        </span>
+      )}
+      {!enabled && hint && (
+        <span className="flex justify-center text-center text-sm text-white/80 w-full [text-shadow:0_1px_3px_black]">
+          {hint}
         </span>
       )}
     </button>

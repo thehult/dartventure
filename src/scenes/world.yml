@@ -8,8 +8,41 @@ actions:
     description: Go play darts at the pub
     action: navigate
     sceneId: pub
+  - name: The Club
+    icon: /game_assets/icons/dartboard.svg
+    description: The Yemaga Darts Club
+    visible: completed("club-invite")
+    action: navigate
+    sceneId: club
+  - name: The District
+    icon: /game_assets/scenes/pub/supporter.png
+    description: The District League
+    visible: completed("district-invite")
+    action: navigate
+    sceneId: district
+  - name: The Nationals
+    icon: /game_assets/icons/medal.svg
+    description: The national ranking circuit
+    visible: completed("nationals-invite")
+    action: navigate
+    sceneId: nationals
+  - name: The Worlds
+    icon: /game_assets/icons/globe.svg
+    description: The world tour, in The Shahani
+    visible: completed("worlds-invite")
+    action: navigate
+    sceneId: worlds
 stories:
   - name: intro
     script:
       - character: you
       - dialogue: Let's see if I can become the world champion!
+      - dialogue: Everyone starts somewhere. The pub down the road is as good a place as any.
+
+  - name: world-champion-epilogue
+    when: flags.worldChampion
+    script:
+      - character: you
+      - dialogue: World champion. Me.
+      - dialogue: From playing chumps at the pub to the top of the world.
+      - dialogue: Maybe I'll pop into the pub for old times' sake.

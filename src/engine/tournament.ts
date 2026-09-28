@@ -134,6 +134,10 @@ export const playerStatus = (tournament: Tournament): TournamentStatus => {
   return lost ? 'eliminated' : 'playing'
 }
 
+/** How many matches the player has won. */
+export const playerWins = (tournament: Tournament) =>
+  tournament.matches.filter((m) => m.winner === PLAYER_ID).length
+
 /** Sets a match's winner and moves them on to their next match. */
 export const recordResult = (
   tournament: Tournament,

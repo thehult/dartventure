@@ -1,0 +1,118 @@
+background: /game_assets/scenes/club/background.svg
+characters:
+  captain:
+    name: Captain Doreen
+  vince:
+    name: Vince Harrow
+    image: /game_assets/scenes/pub/darter.png
+actions:
+  - name: League night
+    icon: /game_assets/icons/dartboard.svg
+    description: Play a league match against a club member. 501 double out.
+    action: match
+    entryFee: 5
+    options:
+      gameId: x01
+      gameOptions:
+        startScore: 501
+        doubleOut: true
+      opponent:
+        relativeAverage: -10
+        minAverage: 30
+    reward:
+      reputation: 6
+      money: 15
+      flags:
+        clubMatchWon: true
+    penalty:
+      reputation: -3
+  - name: Club Championship
+    icon: /game_assets/icons/trophy.svg
+    description: Eight club members, 501 double out.
+    visible: completed("club-championship-invite")
+    action: tournament
+    entryFee: 25
+    options:
+      name: Club Championship
+      players: 8
+      relativeAverage: -12
+      minAverage: 32
+      gameId: x01
+      gameOptions:
+        startScore: 501
+        doubleOut: true
+    roundReward:
+      reputation: 3
+      money: 10
+    reward:
+      reputation: 15
+      money: 100
+      flags:
+        clubChampion: true
+  - name: Back to the map
+    icon: /game_assets/icons/map.svg
+    description: Leave the club.
+    action: navigate
+    sceneId: world
+stories:
+  - name: club-welcome
+    script:
+      - character: captain
+      - dialogue: So you're the one the pub keeps going on about.
+      - dialogue: Welcome to the Yemaga Darts Club. We play *501* here, double out. None of that 301 pub stuff.
+      - dialogue: League nights cost **$5**. Win a few and people will start taking you seriously.
+      - dialogue: Get your reputation to **55** and I'll put your name down for the Club Championship.
+
+  - name: vince-challenge
+    when: flags.clubMatchWon
+    script:
+      - character: vince
+      - dialogue: Hmph. Another pub hero.
+      - dialogue: I'm Vince Harrow. Club champion three years running.
+      - dialogue: Think you're good? One leg. Right now.
+      - choice:
+          - text: Bring it on.
+            goto: play
+          - text: Maybe another time.
+      - dialogue: Thought so. Pub players.
+      - end: true
+      - label: play
+      - match:
+          gameId: x01
+          gameOptions:
+            startScore: 501
+            doubleOut: true
+          opponent:
+            name: Vince Harrow
+            relativeAverage: -5
+            minAverage: 40
+          reward:
+            reputation: 8
+            flags:
+              beatVince: true
+          penalty:
+            reputation: -2
+          onWin: won
+          onLose: lost
+      - label: won
+      - dialogue: "...Lucky darts. Enjoy it while it lasts."
+      - end: true
+      - label: lost
+      - dialogue: Like I said. Pub players.
+
+  - name: club-championship-invite
+    when: reputation >= 55
+    script:
+      - character: captain
+      - dialogue: Your name's been mentioned a lot lately. Good things, mostly.
+      - dialogue: The Club Championship is open to you. Eight players, single elimination.
+      - dialogue: Entry is **$25**. Vince will be there, of course. He always is.
+
+  - name: district-invite
+    when: flags.clubChampion
+    script:
+      - character: captain
+      - dialogue: Club champion! Vince is sulking in the car park.
+      - dialogue: The District League has asked for our best player. That's you.
+      - dialogue: It's a step up. Bigger halls, better players, and a crowd.
+      - dialogue: You'll find the District on your map. Make us proud.

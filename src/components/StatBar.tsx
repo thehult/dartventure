@@ -12,7 +12,7 @@ type StatBarProps = {
 
 const StatBar: React.FC<StatBarProps> = ({ state }) => {
   return (
-    <div className="w-full text-white flex justify-between items-center px-4 py-2 fixed top-0 left-0 z-50 text-base">
+    <div className="w-full text-white flex justify-between items-center px-4 pt-2 pb-4 fixed top-0 left-0 z-50 text-base bg-linear-to-b from-black/70 to-transparent [text-shadow:0_1px_3px_black]">
       <div onClick={() => actions.give({ reputation: reputationHack })}>
         <strong>Reputation:</strong> {state.reputation}
       </div>

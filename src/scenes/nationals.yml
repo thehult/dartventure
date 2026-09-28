@@ -1,0 +1,136 @@
+background: /game_assets/scenes/nationals/background.svg
+characters:
+  official:
+    name: Federation Official
+  vince:
+    name: Vince Harrow
+    image: /game_assets/scenes/pub/darter.png
+  lou:
+    name: Lucky Lou
+    image: /game_assets/scenes/pub/gambler.png
+  kev:
+    name: Kev
+    image: /game_assets/scenes/pub/supporter.png
+actions:
+  - name: Ranking match
+    icon: /game_assets/icons/dartboard.svg
+    description: Play a national ranking match. 501 double out.
+    action: match
+    entryFee: 25
+    options:
+      gameId: x01
+      gameOptions:
+        startScore: 501
+        doubleOut: true
+      opponent:
+        relativeAverage: 0
+        minAverage: 42
+    reward:
+      reputation: 10
+      money: 60
+      flags:
+        nationalsMatchWon: true
+    penalty:
+      reputation: -5
+  - name: National Championship
+    icon: /game_assets/icons/trophy.svg
+    description: The sixteen best players in the country, 501 double out.
+    visible: completed("national-championship-invite")
+    action: tournament
+    entryFee: 100
+    options:
+      name: National Championship
+      players: 16
+      relativeAverage: -8
+      minAverage: 42
+      gameId: x01
+      gameOptions:
+        startScore: 501
+        doubleOut: true
+    roundReward:
+      reputation: 5
+      money: 60
+    reward:
+      reputation: 30
+      money: 750
+      flags:
+        nationalChampion: true
+  - name: Back to the map
+    icon: /game_assets/icons/map.svg
+    description: Leave the venue.
+    action: navigate
+    sceneId: world
+stories:
+  - name: nationals-welcome
+    script:
+      - character: official
+      - dialogue: Welcome to the national ranking circuit.
+      - dialogue: Ranking matches are **$25** to enter. The prize money is better, and so are the players.
+      - dialogue: Reach **190** reputation and you'll be seeded into the *National Championship*.
+
+  - name: vince-returns
+    script:
+      - character: vince
+      - if: flags.beatVince
+        goto: rematch
+      - dialogue: Well, if it isn't the pub hero. Made it this far, did you?
+      - dialogue: Don't get comfortable. The Nationals eat people like you.
+      - end: true
+      - label: rematch
+      - dialogue: You again. I haven't forgotten that leg at the club.
+      - dialogue: I've been practising. Every night. Next time, it won't be so lucky.
+
+  - name: lou-returns
+    when: flags.nationalsMatchWon
+    script:
+      - character: lou
+      - dialogue: Well, look who's gone and got famous!
+      - dialogue: Remember me? I always said you had a decent arm.
+      - dialogue: I'm taking bets on the National Championship. I've got you at 20 to 1.
+      - choice:
+          - text: Put $20 on me.
+            when: money >= 20
+            goto: bet
+          - text: I don't gamble.
+      - dialogue: Wise. Boring, but wise.
+      - end: true
+      - label: bet
+      - give:
+          money: -20
+      - set:
+          betOnSelf: true
+      - dialogue: Done! Win the Championship and it pays out 20 to 1.
+
+  - name: national-championship-invite
+    when: reputation >= 190
+    script:
+      - character: official
+      - dialogue: Congratulations. Your ranking has earned you a seed in the National Championship.
+      - dialogue: Entry is **$100**. Sixteen players, and the final is on television.
+      - if: "!flags.fanClub"
+        goto: done
+      - character: kev
+      - dialogue: TELEVISION! The fan club's hiring a minibus!
+      - label: done
+
+  - name: lou-payout
+    when: flags.nationalChampion && flags.betOnSelf
+    script:
+      - character: lou
+      - dialogue: Twenty to one! You've ruined me!
+      - give:
+          money: 400
+      - dialogue: Here's your **$400**. Don't spend it all at once.
+
+  - name: worlds-invite
+    when: flags.nationalChampion
+    script:
+      - character: official
+      - dialogue: National Champion! The federation is very proud.
+      - dialogue: It comes with an invitation to the *world tour*, in The Shahani.
+      - dialogue: The best players on the planet. No one will go easy on you.
+      - character: vince
+      - dialogue: "...Congratulations. You earned it."
+      - dialogue: Don't embarrass the country.
+      - character: official
+      - dialogue: You'll find The Worlds on your map.

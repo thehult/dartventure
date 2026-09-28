@@ -34,6 +34,8 @@ export type TournamentOptions = {
   average?: number
   /** Base average of the bots relative to the player's average. */
   relativeAverage?: number
+  /** Lowest base average of the bots, whatever the player's average. */
+  minAverage?: number
   /** Each bot's average is randomized within ± this value. Defaults to 5. */
   spread?: number
 }

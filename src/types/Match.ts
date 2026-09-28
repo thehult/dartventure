@@ -10,6 +10,8 @@ export type OpponentOptions = {
   average?: number
   /** Average relative to the player's own average, e.g. `-20`. */
   relativeAverage?: number
+  /** Lowest average the opponent plays at, whatever the player's average. */
+  minAverage?: number
 }
 
 export type MatchOptions = {

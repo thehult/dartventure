@@ -6,6 +6,9 @@ characters:
   drinker:
     name: Regular
     image: /game_assets/scenes/pub/drinker.png
+  lou:
+    name: Lucky Lou
+    image: /game_assets/scenes/pub/gambler.png
 actions:
   - name: Play a chump
     icon: /game_assets/scenes/pub/drinker.png
@@ -20,25 +23,36 @@ actions:
         relativeAverage: -20
     reward:
       reputation: 5
+      money: 5
     penalty:
-      reputation: -5
+      reputation: -2
   - name: Pub tournament
-    icon: /game_assets/scenes/pub/bartender.png
-    description: Play in the pub tournament.
+    icon: /game_assets/icons/trophy.svg
+    description: Play in the pub tournament. Eight players, 301 double out.
     visible: completed("pub-tournament-invite")
     action: tournament
+    entryFee: 10
     options:
       name: Pub Tournament
       players: 8
-      relativeAverage: -10
+      relativeAverage: -15
       gameId: x01
       gameOptions:
         startScore: 301
         doubleOut: true
+    roundReward:
+      reputation: 2
+      money: 5
     reward:
-      reputation: 5
-    penalty:
-      reputation: -5
+      reputation: 10
+      money: 40
+      flags:
+        pubChampion: true
+  - name: Back to the map
+    icon: /game_assets/icons/map.svg
+    description: Leave the pub.
+    action: navigate
+    sceneId: world
 stories:
   - name: welcome
     script:
@@ -47,7 +61,7 @@ stories:
       - dialogue: Welcome to my pub!
       - dialogue: You look like someone who enjoys a game of darts.
       - dialogue: Lots of chumps play here, they are probably up for a game.
-      - dialogue: If you build up some *reputation*, I'll invite you to the pub tournament.
+      - dialogue: If you build up some *reputation*, say **20**, I'll invite you to the pub tournament.
       - dialogue: But more importantly, enjoy yourself!
   - name: first-chump
     script:
@@ -55,11 +69,55 @@ stories:
       - dialogue: Did I hear you are looking for a game?
       - dialogue: I am always up for a game.
 
+  - name: lous-bet
+    when: reputation >= 10 && money >= 10
+    script:
+      - character: lou
+      - dialogue: Psst. You. You've got a decent arm on you.
+      - dialogue: Fancy a little wager? **$10** says my mate Dave beats you.
+      - choice:
+          - text: You're on.
+            goto: bet
+          - text: No thanks.
+      - dialogue: Suit yourself. You know where to find me.
+      - end: true
+      - label: bet
+      - dialogue: Lovely. Dave! You're up!
+      - match:
+          gameId: x01
+          gameOptions:
+            startScore: 301
+            doubleOut: true
+          opponent:
+            name: Dave
+            relativeAverage: -10
+          reward:
+            money: 10
+          penalty:
+            money: -10
+          onWin: won
+          onLose: lost
+      - label: won
+      - dialogue: Well, I'll be. Here's your tenner. Don't tell anyone.
+      - end: true
+      - label: lost
+      - dialogue: Pleasure doing business with you!
+
   - name: pub-tournament-invite
     when: reputation >= 20
     script:
       - character: bartender
       - dialogue: I noticed that you are making a name for yourself around here.
-      - dialogue: How about joining the pub tournament?
+      - dialogue: How about joining the pub tournament? Entry is **$10**.
       - dialogue: It will be a great opportunity to show off your skills.
       - dialogue: And perhaps win some *money*!
+
+  - name: club-invite
+    when: flags.pubChampion
+    script:
+      - character: bartender
+      - dialogue: Pub champion! I knew you had it in you.
+      - dialogue: If I'm honest, you've outgrown this place.
+      - dialogue: There's a proper darts club across town, the *Yemaga Darts Club*. The captain's a friend of mine.
+      - dialogue: I've put in a good word. You'll find it on your map.
+      - dialogue: Don't forget where you started!

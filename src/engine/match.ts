@@ -18,13 +18,19 @@ const AVERAGE_WEIGHT = 0.2
 
 /**
  * Resolves a bot's average: an absolute `average` wins, otherwise it is the
- * player's average plus `relativeAverage`.
+ * player's average plus `relativeAverage`, but at least `minAverage`.
  */
 export const resolveAverage = (
-  options: { average?: number; relativeAverage?: number },
+  options: { average?: number; relativeAverage?: number; minAverage?: number },
   playerAverage: number,
 ): number =>
-  clampAverage(options.average ?? playerAverage + (options.relativeAverage ?? 0))
+  clampAverage(
+    options.average ??
+      Math.max(
+        playerAverage + (options.relativeAverage ?? 0),
+        options.minAverage ?? 0,
+      ),
+  )
 
 const createMatchId = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`

@@ -1,0 +1,109 @@
+background: /game_assets/scenes/worlds/background.svg
+characters:
+  mc:
+    name: The MC
+  bartender:
+    name: Bartender
+    image: /game_assets/scenes/pub/bartender.png
+  vince:
+    name: Vince Harrow
+    image: /game_assets/scenes/pub/darter.png
+  kev:
+    name: Kev
+    image: /game_assets/scenes/pub/supporter.png
+actions:
+  - name: Tour match
+    icon: /game_assets/icons/dartboard.svg
+    description: Play a world tour match against a professional. 501 double out.
+    action: match
+    entryFee: 50
+    options:
+      gameId: x01
+      gameOptions:
+        startScore: 501
+        doubleOut: true
+      opponent:
+        relativeAverage: 0
+        minAverage: 48
+    reward:
+      reputation: 12
+      money: 150
+      flags:
+        worldsMatchWon: true
+    penalty:
+      reputation: -6
+  - name: World Championship
+    icon: /game_assets/icons/trophy.svg
+    description: Thirty-two of the world's best, 501 double out.
+    visible: completed("world-championship-invite")
+    action: tournament
+    entryFee: 250
+    options:
+      name: World Championship
+      players: 32
+      relativeAverage: -8
+      minAverage: 48
+      gameId: x01
+      gameOptions:
+        startScore: 501
+        doubleOut: true
+    roundReward:
+      reputation: 6
+      money: 200
+    reward:
+      reputation: 50
+      money: 5000
+      flags:
+        worldChampion: true
+  - name: Back to the map
+    icon: /game_assets/icons/map.svg
+    description: Leave the arena.
+    action: navigate
+    sceneId: world
+stories:
+  - name: worlds-welcome
+    script:
+      - character: mc
+      - dialogue: Ladies and gentlemen... welcome to The Shahani, home of the World Championship!
+      - dialogue: Tour matches are **$50** a go, and every one of them is against a professional.
+      - dialogue: Reach **290** reputation to earn your place at the *World Championship*.
+
+  - name: bartender-visit
+    when: flags.worldsMatchWon
+    script:
+      - character: bartender
+      - dialogue: Surprise! The whole pub chipped in for my ticket.
+      - dialogue: The regulars are watching back home. Even the chumps.
+      - dialogue: Go on then. Show them how it's done.
+
+  - name: world-championship-invite
+    when: reputation >= 290
+    script:
+      - character: mc
+      - dialogue: The draw has been made... and the final name in the World Championship is...
+      - dialogue: "...YOU!"
+      - dialogue: Thirty-two players. Five rounds. One champion.
+      - dialogue: Entry is **$250**. The winner takes home **$5000** and the title.
+      - if: "!flags.fanClub"
+        goto: done
+      - character: kev
+      - dialogue: THE MINIBUS MADE IT! WE'RE ALL HERE!
+      - label: done
+
+  - name: world-champion
+    when: flags.worldChampion
+    script:
+      - character: mc
+      - dialogue: "...and the new champion of the WORLD is... from The Yemaga... it's YOU!"
+      - if: "!flags.fanClub"
+        goto: vince
+      - character: kev
+      - dialogue: WORLD CHAMPION! I'M CRYING! I'M ACTUALLY CRYING!
+      - label: vince
+      - character: vince
+      - dialogue: Hmph.
+      - dialogue: "...Well played. Truly."
+      - character: bartender
+      - dialogue: Drinks are on the house when you get home. Just this once.
+      - character: mc
+      - dialogue: Congratulations, World Champion!
