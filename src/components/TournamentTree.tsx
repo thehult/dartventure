@@ -1,57 +1,72 @@
-import { useTournament } from '@/hooks/useTournament'
-import type { TournamentMatch } from '@/types/Tournament'
+import type { PlayerId } from '@dartgames/core'
+import type { BracketMatch, Tournament } from '@/types/Tournament'
+import { PLAYER_ID } from '@/types/Player'
 
-function TournamentMatchComponent({ match }: { match: TournamentMatch }) {
-  const hasChildren = !!match.children
+const roundName = (round: number, rounds: number) => {
+  const fromEnd = rounds - round
+  if (fromEnd === 0) return 'Final'
+  if (fromEnd === 1) return 'Semi-finals'
+  if (fromEnd === 2) return 'Quarter-finals'
+  return `Round ${round}`
+}
 
+function Slot({
+  tournament,
+  match,
+  playerId,
+}: {
+  tournament: Tournament
+  match: BracketMatch
+  playerId?: PlayerId
+}) {
+  const player = tournament.players.find((p) => p.id === playerId)
+  const won = playerId !== undefined && match.winner === playerId
+  const lost = match.winner !== undefined && !won
   return (
-    <div className="relative flex flex-row items-center my-3">
-      {/* Children matches to the left */}
-      {hasChildren && (
-        <div className="flex flex-col justify-between relative mr-8">
-          {/* Vertical line connecting children */}
-          <div className="absolute left-full w-8 h-full">
-            <div className="absolute left-1/2 right-0 top-1/2 w-4 h-px bg-gray-400"></div>
-            <div className="absolute left-0 right-1/2 top-1/4 w-4 h-px bg-gray-400"></div>
-            <div className="absolute left-0 right-1/2 top-3/4 w-4 h-px bg-gray-400"></div>
-            <div className="absolute left-1/2 top-1/4 h-1/2 w-px bg-gray-400"></div>
-            {/* <div className="absolute left-0 top-1/8 h-1/4 w-px bg-gray-400"></div>
-            <div className="absolute left-0 top-5/8 h-1/4 w-px bg-gray-400"></div> */}
-          </div>
-          {match.children!.map((child) => (
-            <TournamentMatchComponent key={child.id} match={child} />
-          ))}
-        </div>
-      )}
-
-      {/* This match block */}
-      <div className="flex flex-col items-center w-48">
-        <div
-          className={`text-md text-center py-2 px-2 py-1 rounded mb-1 w-full ${match.player1?.id === 'player' ? 'font-bold' : ''}`}
-        >
-          {match.player1?.name || '_'}
-        </div>
-        <div
-          className={`text-md text-center py-2 px-2 py-1 rounded w-full  ${match.player2?.id === 'player' ? 'text-bold' : ''}`}
-        >
-          {match.player2?.name || '_'}
-        </div>
-      </div>
+    <div
+      className={[
+        'text-md text-center py-1 px-2 w-full truncate',
+        playerId === PLAYER_ID ? 'font-bold' : '',
+        lost ? 'line-through opacity-50' : '',
+        won ? 'text-(--primary-color)' : '',
+      ].join(' ')}
+    >
+      {player?.name ?? '_'}
     </div>
   )
 }
 
-export function TournamentTree() {
-  const { rootMatch } = useTournament()
-
-  if (!rootMatch) return <></>
+export function TournamentTree({ tournament }: { tournament: Tournament }) {
+  const rounds = Array.from({ length: tournament.rounds }, (_, i) => i + 1)
 
   return (
-    <div className="flex items-center overflow-auto p-6 min-h-2/3 text-neutral-50 font-[Kalam]">
-      <div className="bg-neutral-950 border-double border-white border-1">
-        <h1 className="my-2 text-center text-2xl">Tournament</h1>
-        <TournamentMatchComponent match={rootMatch} />
-      </div>
+    <div className="flex flex-row items-stretch gap-6 overflow-x-auto">
+      {rounds.map((round) => (
+        <div key={round} className="flex flex-col min-w-36">
+          <h2 className="text-center text-lg mb-2">
+            {roundName(round, tournament.rounds)}
+          </h2>
+          <div className="flex flex-col justify-around flex-grow gap-3">
+            {tournament.matches
+              .filter((m) => m.round === round)
+              .map((match) => (
+                <div key={match.id} className="border-1 border-white/40">
+                  <Slot
+                    tournament={tournament}
+                    match={match}
+                    playerId={match.player1}
+                  />
+                  <div className="h-px bg-white/40" />
+                  <Slot
+                    tournament={tournament}
+                    match={match}
+                    playerId={match.player2}
+                  />
+                </div>
+              ))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

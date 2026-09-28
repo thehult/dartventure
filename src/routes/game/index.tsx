@@ -1,57 +1,37 @@
-import { Background } from '@/components/Background'
-import { createFileRoute } from '@tanstack/react-router'
-import { Character } from '@/components/Character'
-import { Dialogue } from '@/components/Dialogue'
-
-import { useStory } from '@/hooks/useStory'
-import { useClickAnyWhere } from 'usehooks-ts'
-import { ActionMap } from '@/components/ActionMap'
-import StatBar from '@/components/StatBar'
-import type { SceneId } from '@/scenes/scenes'
-import { useScene } from '@/hooks/useScene'
-
-export type SceneSearchParams = {
-  sceneId: SceneId
-}
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { restoreSession, useGameState } from '@/state/store'
+import { SceneScreen } from '@/screens/SceneScreen'
+import { MatchScreen } from '@/screens/MatchScreen'
+import { TournamentScreen } from '@/screens/TournamentScreen'
 
 export const Route = createFileRoute('/game/')({
-  component: SceneComponent,
+  beforeLoad: () => {
+    if (!restoreSession()) throw redirect({ to: '/' })
+  },
+  component: GameScreen,
 })
 
-function SceneComponent() {
-  const { scene } = useScene()
-  const { loaded, hasStory, currentCharacter, currentDialogue, advanceStory } =
-    useStory(scene)
+/** Shows whatever the player is doing, as decided by `state.activity`. */
+function GameScreen() {
+  const state = useGameState()
+  const activity = state.activity
 
-  useClickAnyWhere(() => {
-    advanceStory()
-  })
-
-  const characterEntered = () => {
-    advanceStory()
+  if (activity?.type === 'match') {
+    return (
+      <MatchScreen key={activity.match.id} state={state} match={activity.match} />
+    )
   }
-
-  if (!loaded) {
-    return <div>Loading...</div>
-  }
-
-  return (
-    <Background background={scene.background}>
-      <StatBar />
-      {Object.values(scene.characters).map((character) => (
-        <Character
-          key={character.name}
-          image={character.image}
-          visible={currentCharacter?.name === character.name}
-          onEntered={characterEntered}
+  if (activity?.type === 'tournament') {
+    if (activity.match) {
+      return (
+        <MatchScreen
+          key={activity.match.id}
+          state={state}
+          match={activity.match}
         />
-      ))}
-      {currentDialogue !== null && (
-        <Dialogue speaker={currentCharacter?.name} visible={true}>
-          {currentDialogue}
-        </Dialogue>
-      )}
-      {!hasStory && <ActionMap actions={scene.actions} />}
-    </Background>
-  )
+      )
+    }
+    return <TournamentScreen state={state} activity={activity} />
+  }
+  return <SceneScreen state={state} />
 }

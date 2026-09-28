@@ -15,7 +15,7 @@ export type Key =
   | 'undo'
   | 'enter'
 
-const INPUT_BUTTONS: Key[] = [
+const INPUT_BUTTONS: Array<Key> = [
   '1',
   '2',
   '3',

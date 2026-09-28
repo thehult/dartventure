@@ -1,22 +1,23 @@
 import { ScoreInput } from '@dartgames/core'
-import { type X01 } from '@dartgames/games'
 import { useGame } from '@dartgames/react'
 import { useMemo, useState } from 'react'
+import type {X01} from '@dartgames/games';
 import type { GameComponent } from '../GameComponent'
 import type { DartPlayer } from '@/types/Player'
-import Keypad, { type Key } from '@/components/Keypad'
+import type {Key} from '@/components/Keypad';
+import Keypad from '@/components/Keypad'
 
 const X01Pub: GameComponent = ({ localPlayerId }) => {
   const { game, state, running, history, submitInput } = useGame<X01>()
-  const players = useMemo<DartPlayer[]>(
-    () => game.players as DartPlayer[],
+  const players = useMemo<Array<DartPlayer>>(
+    () => game.players as Array<DartPlayer>,
     [game],
   )
   const [input, setInput] = useState<string>('')
 
   const handleButtonClick = (button: Key) => {
     if (button === 'undo') {
-      setInput((input) => input.substring(0, input.length - 1))
+      setInput((prev) => prev.substring(0, prev.length - 1))
     } else if (button === 'enter') {
       let score = parseInt(input)
       if (isNaN(score)) score = 0
@@ -36,8 +37,8 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     hit?: number
     score: number
   }
-  const chalkboard = useMemo<Record<string, ChalkboardEntry[]>>(() => {
-    const scores: Record<string, ChalkboardEntry[]> = players.reduce(
+  const chalkboard = useMemo<Record<string, Array<ChalkboardEntry>>>(() => {
+    const scores: Record<string, Array<ChalkboardEntry>> = players.reduce(
       (s, p) => ({ ...s, [p.id]: [{ score: history[0].scores[p.id] }] }),
       {},
     )

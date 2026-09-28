@@ -1,36 +1,22 @@
-import { randomMaleName } from '@/util/names'
 import type { IPlayer } from '@dartgames/core'
 
 export const PLAYER_ID = 'player'
-export const OPPONENT_ID = 'opponent'
 
 export interface DartPlayer extends IPlayer {
   name: string
 }
 
-export interface Opponent extends DartPlayer {
+export interface BotPlayer extends DartPlayer {
+  /** Three-dart average the bot throws at. */
   average: number
-  strategy?: string
 }
 
-export function createOpponent(name: string, average: number): Opponent
-export function createOpponent(average: number): Opponent
-export function createOpponent(
-  nameOrAverage: string | number,
-  average?: number,
-): Opponent {
-  const clampAverage = (avg: number) => Math.max(15, Math.min(110, avg))
+export const MIN_AVERAGE = 15
+export const MAX_AVERAGE = 110
 
-  if (typeof nameOrAverage === 'string') {
-    return {
-      id: OPPONENT_ID,
-      name: nameOrAverage,
-      average: clampAverage(average ?? 0),
-    }
-  }
-  return {
-    id: OPPONENT_ID,
-    name: randomMaleName(),
-    average: clampAverage(nameOrAverage ?? 0),
-  }
-}
+/** Bots can only be created for whole-number averages within this range. */
+export const clampAverage = (average: number) =>
+  Math.round(Math.max(MIN_AVERAGE, Math.min(MAX_AVERAGE, average)))
+
+export const isBot = (player: DartPlayer): player is BotPlayer =>
+  'average' in player

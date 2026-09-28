@@ -12,11 +12,12 @@ actions:
     description: Play a game of darts with a regular.
     action: match
     options:
-      average: -20
       gameId: x01
       gameOptions:
         startScore: 301
         doubleOut: true
+      opponent:
+        relativeAverage: -20
     reward:
       reputation: 5
     penalty:
@@ -24,13 +25,12 @@ actions:
   - name: Pub tournament
     icon: /game_assets/scenes/pub/bartender.png
     description: Play in the pub tournament.
-    unlocked_by: pub-tournament-invite
-    requirements:
-      - reputation: 10
+    visible: completed("pub-tournament-invite")
     action: tournament
     options:
+      name: Pub Tournament
       players: 8
-      average: -10
+      relativeAverage: -10
       gameId: x01
       gameOptions:
         startScore: 301
@@ -56,8 +56,7 @@ stories:
       - dialogue: I am always up for a game.
 
   - name: pub-tournament-invite
-    requirements:
-      - reputation: 20
+    when: reputation >= 20
     script:
       - character: bartender
       - dialogue: I noticed that you are making a name for yourself around here.

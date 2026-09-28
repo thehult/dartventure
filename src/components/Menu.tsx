@@ -12,12 +12,14 @@ export const Menu: React.FC<MenuProps> = ({ children }) => {
 
 export type MenuButtonProps = {
   visible?: boolean
+  type?: 'button' | 'submit'
   onClick?: () => void
   children?: React.ReactNode
 }
 
 export const MenuButton: React.FC<MenuButtonProps> = ({
   visible = true,
+  type = 'button',
   onClick,
   children,
 }) => {
@@ -25,6 +27,7 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
 
   return (
     <button
+      type={type}
       className="w-full md:w-1/2 lg:w-1/4 py-6 bg-(--alternative-color) text-white rounded-sm text-xl font-semibold shadow hover:bg-(--secondary-color) hover:cursor-pointer transition"
       onClick={onClick}
     >

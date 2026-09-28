@@ -1,9 +1,8 @@
-import type { IInput, PlayerId } from '@dartgames/core'
+import type { PlayerId } from '@dartgames/core'
 
 type GameComponentProps = {
   localPlayerId: PlayerId
-  onRequestInput?: (player: PlayerId) => IInput
-  onGameOver?: (playerWon: boolean) => void
 }
 
-export interface GameComponent extends React.FC<GameComponentProps> {}
+/** Renders a game inside a `GameProvider`. */
+export type GameComponent = React.FC<GameComponentProps>

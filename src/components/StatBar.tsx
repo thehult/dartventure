@@ -1,21 +1,26 @@
 import React from 'react'
-import { useGameSave } from '../hooks/useGameSave'
+import type { GameState } from '@/types/GameState'
+import { actions } from '@/state/actions'
 
-const reputationHack = import.meta.env.MODE === 'development' ? 5 : 0
-const moneyHack = import.meta.env.MODE === 'development' ? 100 : 0
+// Clicking the stats in development gives some for free, for testing.
+const reputationHack = import.meta.env.DEV ? 5 : 0
+const moneyHack = import.meta.env.DEV ? 100 : 0
 
-interface StatBarProps {}
+type StatBarProps = {
+  state: GameState
+}
 
-const StatBar: React.FC<StatBarProps> = () => {
-  const gameSave = useGameSave()
-
+const StatBar: React.FC<StatBarProps> = ({ state }) => {
   return (
     <div className="w-full text-white flex justify-between items-center px-4 py-2 fixed top-0 left-0 z-50 text-base">
-      <div onClick={() => gameSave.addReputation(reputationHack)}>
-        <strong>Reputation:</strong> {gameSave.reputation}
+      <div onClick={() => actions.give({ reputation: reputationHack })}>
+        <strong>Reputation:</strong> {state.reputation}
       </div>
-      <div onClick={() => gameSave.addMoney(moneyHack)}>
-        <strong>Money:</strong> ${gameSave.money}
+      <div>
+        <strong>Average:</strong> {state.playerAverage.toFixed(1)}
+      </div>
+      <div onClick={() => actions.give({ money: moneyHack })}>
+        <strong>Money:</strong> ${state.money}
       </div>
     </div>
   )
