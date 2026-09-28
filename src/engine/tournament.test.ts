@@ -27,6 +27,7 @@ const create = (players = 8): Tournament =>
     { players, gameId: 'x01', relativeAverage: -10 },
     { id: PLAYER_ID, name: 'Phil' },
     60,
+    'normal',
     seeded(42),
   )
 

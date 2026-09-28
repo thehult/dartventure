@@ -33,8 +33,26 @@ describe('migrateSave', () => {
     expect(save.activity).toBeNull()
   })
 
+  it('adds the normal difficulty to a v5 save', () => {
+    const { difficulty: _, ...current } = createGameState('Phil')
+    const save = migrateSave({ ...current, version: 5 })
+    expect(save.version).toBe(CURRENT_VERSION)
+    expect(save.difficulty).toBe('normal')
+  })
+
   it('leaves a current save untouched', () => {
     const save = createGameState('Phil')
     expect(migrateSave(save)).toBe(save)
+  })
+})
+
+describe('createGameState', () => {
+  it('starts with the chosen difficulty and average', () => {
+    const state = createGameState('Phil', {
+      difficulty: 'easy',
+      playerAverage: 32,
+    })
+    expect(state.difficulty).toBe('easy')
+    expect(state.playerAverage).toBe(32)
   })
 })

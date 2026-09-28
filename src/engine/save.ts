@@ -1,3 +1,5 @@
+import { DEFAULT_DIFFICULTY } from './difficulty'
+import type { Difficulty } from './difficulty'
 import type { GameState } from '@/types/GameState'
 
 export const START_LOCATION = 'world'
@@ -15,11 +17,12 @@ type SaveV3 = Omit<SaveV2, 'version'> & {
   introducedGames: Array<string>
 }
 type SaveV4 = Omit<SaveV3, 'version'> & { version: 4; playerAverage: number }
-type SaveV5 = GameState
+type SaveV5 = Omit<GameState, 'version' | 'difficulty'> & { version: 5 }
+type SaveV6 = GameState
 
 /** Every save format that has ever existed. */
-export type AnySave = SaveV1 | SaveV2 | SaveV3 | SaveV4 | SaveV5
-export const CURRENT_VERSION: GameState['version'] = 5
+export type AnySave = SaveV1 | SaveV2 | SaveV3 | SaveV4 | SaveV5 | SaveV6
+export const CURRENT_VERSION: GameState['version'] = 6
 
 const migrations: {
   [V in Exclude<AnySave['version'], GameState['version']>]: (
@@ -46,6 +49,7 @@ const migrations: {
     location: START_LOCATION,
     activity: null,
   }),
+  5: (save) => ({ ...save, version: 6, difficulty: DEFAULT_DIFFICULTY }),
 }
 
 export const migrateSave = (save: AnySave): GameState => {
@@ -56,12 +60,16 @@ export const migrateSave = (save: AnySave): GameState => {
   return save
 }
 
-export const createGameState = (playerName: string): GameState => ({
+export const createGameState = (
+  playerName: string,
+  options: { difficulty?: Difficulty; playerAverage?: number } = {},
+): GameState => ({
   version: CURRENT_VERSION,
   playerName,
+  difficulty: options.difficulty ?? DEFAULT_DIFFICULTY,
   money: 0,
   reputation: 0,
-  playerAverage: DEFAULT_PLAYER_AVERAGE,
+  playerAverage: options.playerAverage ?? DEFAULT_PLAYER_AVERAGE,
   completedStories: [],
   introducedGames: [],
   flags: {},

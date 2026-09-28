@@ -3,6 +3,7 @@
  * Used by `pacing.test.ts`; run it with `npm test -- pacing` and read the
  * printed table when tuning rewards and gates.
  */
+import type { Difficulty } from '@/engine/difficulty'
 import type { GameState } from '@/types/GameState'
 import type { Action } from '@/types/Scene'
 import {
@@ -56,8 +57,9 @@ export const playCampaign = (
   random: () => number,
   wins: 'always' | 'model' = 'model',
   maxMatches = 3000,
+  difficulty: Difficulty = 'normal',
 ): CampaignResult => {
-  let state = settle({ ...createGameState('Sim'), playerAverage })
+  let state = settle(createGameState('Sim', { difficulty, playerAverage }))
   const result: CampaignResult = {
     finished: false,
     matches: 0,

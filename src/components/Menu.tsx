@@ -39,13 +39,21 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
 export type MenuImageProps = {
   image: string
   visible?: boolean
+  small?: boolean
 }
 
 export const MenuImage: React.FC<MenuImageProps> = ({
   image,
   visible = true,
+  small = false,
 }) => {
   if (!visible) return
 
-  return <img src={image} alt="Game Logo" className="w-64 h-64 mb-8" />
+  return (
+    <img
+      src={image}
+      alt="Game Logo"
+      className={small ? 'w-32 h-32' : 'w-64 h-64 mb-8'}
+    />
+  )
 }

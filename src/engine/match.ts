@@ -1,3 +1,4 @@
+import { DEFAULT_DIFFICULTY, DIFFICULTIES } from './difficulty'
 import type { BotPlayer } from '@/types/Player'
 import type {
   ActiveMatch,
@@ -7,6 +8,7 @@ import type {
 } from '@/types/Match'
 import type { GameState } from '@/types/GameState'
 import type { Outcome } from '@/types/Outcome'
+import type { Difficulty } from './difficulty'
 import { getGame } from '@/games/registry'
 import { PLAYER_ID, clampAverage } from '@/types/Player'
 import { randomMaleName } from '@/util/names'
@@ -18,19 +20,25 @@ const AVERAGE_WEIGHT = 0.2
 
 /**
  * Resolves a bot's average: an absolute `average` wins, otherwise it is the
- * player's average plus `relativeAverage`, but at least `minAverage`.
+ * player's average plus `relativeAverage`, but at least `minAverage`. The
+ * difficulty shifts the result and scales `minAverage`.
  */
 export const resolveAverage = (
   options: { average?: number; relativeAverage?: number; minAverage?: number },
   playerAverage: number,
-): number =>
-  clampAverage(
-    options.average ??
-      Math.max(
-        playerAverage + (options.relativeAverage ?? 0),
-        options.minAverage ?? 0,
-      ),
+  difficulty: Difficulty = DEFAULT_DIFFICULTY,
+): number => {
+  const { averageOffset, floorScale } = DIFFICULTIES[difficulty]
+  if (options.average !== undefined) {
+    return clampAverage(options.average + averageOffset)
+  }
+  return clampAverage(
+    Math.max(
+      playerAverage + (options.relativeAverage ?? 0) + averageOffset,
+      (options.minAverage ?? 0) * floorScale,
+    ),
   )
+}
 
 const createMatchId = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
@@ -52,7 +60,11 @@ export const createActiveMatch = (
       opponent ?? {
         id: OPPONENT_ID,
         name: options.opponent?.name ?? randomMaleName(),
-        average: resolveAverage(options.opponent ?? {}, state.playerAverage),
+        average: resolveAverage(
+          options.opponent ?? {},
+          state.playerAverage,
+          state.difficulty,
+        ),
       },
     ],
     reward: outcomes.reward,

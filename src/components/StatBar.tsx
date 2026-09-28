@@ -1,5 +1,7 @@
 import React from 'react'
 import type { GameState } from '@/types/GameState'
+import type { Difficulty } from '@/engine/difficulty'
+import { DIFFICULTIES, DIFFICULTY_ORDER } from '@/engine/difficulty'
 import { actions } from '@/state/actions'
 
 // Clicking the stats in development gives some for free, for testing.
@@ -16,8 +18,25 @@ const StatBar: React.FC<StatBarProps> = ({ state }) => {
       <div onClick={() => actions.give({ reputation: reputationHack })}>
         <strong>Reputation:</strong> {state.reputation}
       </div>
-      <div>
-        <strong>Average:</strong> {state.playerAverage.toFixed(1)}
+      <div className="flex items-center gap-3">
+        <span>
+          <strong>Average:</strong> {state.playerAverage.toFixed(1)}
+        </span>
+        <select
+          aria-label="Difficulty"
+          title={DIFFICULTIES[state.difficulty].description}
+          className="bg-black/60 border-1 border-white/40 rounded px-1 text-sm cursor-pointer"
+          value={state.difficulty}
+          onChange={(e) =>
+            actions.setDifficulty(e.target.value as Difficulty)
+          }
+        >
+          {DIFFICULTY_ORDER.map((d) => (
+            <option key={d} value={d}>
+              {DIFFICULTIES[d].name}
+            </option>
+          ))}
+        </select>
       </div>
       <div onClick={() => actions.give({ money: moneyHack })}>
         <strong>Money:</strong> ${state.money}

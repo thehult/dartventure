@@ -1,4 +1,6 @@
 import { resolveAverage } from './match'
+import { DEFAULT_DIFFICULTY } from './difficulty'
+import type { Difficulty } from './difficulty'
 import type { PlayerId } from '@dartgames/core'
 import type { BotPlayer, DartPlayer } from '@/types/Player'
 import type {
@@ -71,9 +73,10 @@ export const createTournament = (
   options: TournamentOptions,
   player: DartPlayer,
   playerAverage: number,
+  difficulty: Difficulty = DEFAULT_DIFFICULTY,
   random: Random = Math.random,
 ): Tournament => {
-  const baseAverage = resolveAverage(options, playerAverage)
+  const baseAverage = resolveAverage(options, playerAverage, difficulty)
   const spread = options.spread ?? DEFAULT_SPREAD
   const bots: Array<BotPlayer> = randomMaleNames(
     options.players - 1,

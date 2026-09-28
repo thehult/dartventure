@@ -1,5 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { MILESTONES, playCampaign } from './pacing'
+import type { CampaignResult } from './pacing'
+import type { Difficulty } from '@/engine/difficulty'
+
+/** Simulations play hundreds of matches. */
+const TIMEOUT = 120_000
 
 /** Deterministic pseudo-random numbers. */
 const seeded = (seed: number) => () => {
@@ -12,7 +17,37 @@ const median = (values: Array<number>) => {
   return sorted[Math.floor(sorted.length / 2)]
 }
 
+/** Plays 10 campaigns and prints how long each milestone took. */
+const simulate = (
+  difficulty: Difficulty,
+  average: number,
+): Array<CampaignResult> => {
+  const runs = Array.from({ length: 10 }, (_, i) =>
+    playCampaign(average, seeded(average * 100 + i), 'model', 1000, difficulty),
+  )
+  console.info(
+    `${difficulty} at average ${average}: ` +
+      `median ${median(runs.map((r) => (r.finished ? r.matches : Infinity)))} matches, ` +
+      `${runs.filter((r) => r.finished).length}/10 finished\n` +
+      MILESTONES.map(
+        (m) =>
+          `  ${m}: ${median(runs.map((r) => r.milestones[m] ?? Infinity))}`,
+      ).join('\n'),
+  )
+  return runs
+}
+
+const matchesTo = (
+  runs: Array<CampaignResult>,
+  milestone: (typeof MILESTONES)[number] = 'worldChampion',
+) => median(runs.map((r) => r.milestones[milestone] ?? Infinity))
+
 describe('campaign pacing', () => {
+  beforeAll(() => {
+    // The bots' strategy logs every throw, which adds up to a lot of output.
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+  })
+
   it('can be finished by winning every match', () => {
     const result = playCampaign(60, seeded(1), 'always')
     expect(result.finished).toBe(true)
@@ -21,36 +56,38 @@ describe('campaign pacing', () => {
     expect(result.matches).toBeLessThanOrEqual(60)
   })
 
-  // Opponents' averages have floors, so weaker players have to improve their
-  // real average to get all the way. A 40 average should still get far.
-  // (In simulations it becomes national champion only after hundreds of
-  // matches, and doesn't win the worlds.)
-  it.each([
-    { average: 40, reaches: 'districtChampion' },
-    { average: 50, reaches: 'worldChampion' },
-    { average: 60, reaches: 'worldChampion' },
-    { average: 80, reaches: 'worldChampion' },
-  ] as const)(
-    'is paced reasonably at average $average',
-    ({ average, reaches }) => {
-      const runs = Array.from({ length: 10 }, (_, i) =>
-        playCampaign(average, seeded(average * 100 + i), 'model', 1000),
-      )
-      const rows = MILESTONES.map((m) => ({
-        milestone: m,
-        medianMatches: median(runs.map((r) => r.milestones[m] ?? Infinity)),
-      }))
-      console.log(
-        `Average ${average}: median ${median(runs.map((r) => r.matches))} matches, ` +
-          `${median(runs.map((r) => r.tournamentsPlayed))} tournaments, ` +
-          `broke ${median(runs.map((r) => r.timesBroke))} times\n` +
-          rows.map((r) => `  ${r.milestone}: ${r.medianMatches}`).join('\n'),
-      )
-      const reached = runs.map((r) => r.milestones[reaches] ?? Infinity)
-      expect(median(reached)).toBeLessThanOrEqual(150)
-      if (reaches === 'worldChampion') {
-        expect(median(reached)).toBeLessThanOrEqual(130)
-      }
+  it(
+    'lets anyone finish on easy',
+    () => {
+      expect(matchesTo(simulate('easy', 30))).toBeLessThanOrEqual(150)
+      expect(matchesTo(simulate('easy', 80))).toBeLessThanOrEqual(150)
     },
+    TIMEOUT,
+  )
+
+  it(
+    'expects some skill on normal',
+    () => {
+      // A 40 average gets through the district, but the worlds need about 50.
+      expect(
+        matchesTo(simulate('normal', 40), 'districtChampion'),
+      ).toBeLessThanOrEqual(150)
+      expect(matchesTo(simulate('normal', 60))).toBeLessThanOrEqual(200)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'challenges strong players on hard and pro',
+    () => {
+      const easy = matchesTo(simulate('easy', 80))
+      const hard = matchesTo(simulate('hard', 80))
+      expect(hard).toBeGreaterThan(easy)
+      expect(hard).toBeLessThanOrEqual(400)
+
+      const pro = simulate('pro', 90)
+      expect(pro.filter((r) => r.finished).length).toBeGreaterThanOrEqual(5)
+    },
+    TIMEOUT,
   )
 })

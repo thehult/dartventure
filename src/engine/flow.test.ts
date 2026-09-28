@@ -8,6 +8,7 @@ import {
   performAction,
   repair,
   resolveMatch,
+  setDifficulty,
   settle,
   startTournamentMatch,
   tournamentSummary,
@@ -85,6 +86,14 @@ describe('game flow', () => {
     state = performAction(state, action('pub', 'Play a chump'))
     if (state.activity?.type !== 'match') throw new Error('No match')
     expect(state.activity.match.players[1].average).toBe(50)
+  })
+
+  it('matches opponents to the difficulty', () => {
+    let state = skipStories(performAction(newGame(), action('world', 'The Pub')))
+    state = setDifficulty({ ...state, playerAverage: 70 }, 'pro')
+    state = performAction(state, action('pub', 'Play a chump'))
+    if (state.activity?.type !== 'match') throw new Error('No match')
+    expect(state.activity.match.players[1].average).toBe(55)
   })
 
   it('keeps opponents above their minimum average', () => {

@@ -1,5 +1,6 @@
 import type { Activity } from './Activity'
 import type { FlagValue } from './Outcome'
+import type { Difficulty } from '@/engine/difficulty'
 
 export type Stats = {
   matchesPlayed: number
@@ -13,8 +14,9 @@ export type Stats = {
  * persisted as one object, so there is a single source of truth.
  */
 export type GameState = {
-  version: 5
+  version: 6
   playerName: string
+  difficulty: Difficulty
   money: number
   reputation: number
   playerAverage: number

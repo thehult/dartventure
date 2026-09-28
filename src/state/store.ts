@@ -69,14 +69,17 @@ export const listSaves = (): Array<SaveInfo> =>
 const writeIndex = (saves: Array<SaveInfo>) =>
   write(localStorage, INDEX_KEY, saves)
 
-export const createSave = (playerName: string): string => {
+export const createSave = (
+  playerName: string,
+  options: Parameters<typeof createGameState>[1] = {},
+): string => {
   const id = Date.now().toString(16)
   const now = Date.now()
   writeIndex([
     ...listSaves(),
     { id, name: playerName, createdAt: now, latestLoad: now },
   ])
-  write(localStorage, saveKey(id), createGameState(playerName))
+  write(localStorage, saveKey(id), createGameState(playerName, options))
   openSave(id)
   return id
 }
