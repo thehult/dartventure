@@ -31,15 +31,13 @@ export function TournamentScreen({
   return (
     <Background background={getScene(state.location).background}>
       <StatBar state={state} />
-      <div className="flex items-center justify-center w-full h-full p-4 pt-12 text-neutral-50 font-[Kalam]">
-        <div className="flex flex-col items-center gap-4 max-w-full max-h-full overflow-auto p-4 bg-neutral-950 border-double border-white border-1">
-          <h1 className="text-2xl">{activity.tournament.name}</h1>
-          <TournamentTree tournament={activity.tournament} />
-
+      <div className="flex w-full h-full p-2 sm:p-4 pt-12 sm:pt-12 overflow-y-auto text-neutral-50 font-[Kalam]">
+        <div className="m-auto flex flex-col items-center gap-3 sm:gap-4 w-full md:w-auto max-w-full p-3 sm:p-4 bg-neutral-950 border-double border-white border-1">
+          <h1 className="text-2xl short:text-xl">{activity.tournament.name}</h1>
           {summary.status === 'playing' && summary.nextOpponent && (
             <>
               <p>Next up: {summary.nextOpponent.name}</p>
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-wrap justify-center">
                 <button className={buttonClass} onClick={withdraw}>
                   Withdraw
                 </button>
@@ -69,6 +67,10 @@ export function TournamentScreen({
               </button>
             </>
           )}
+
+          {/* Below the actions, so they stay in reach when a big bracket
+              doesn't fit on a phone. */}
+          <TournamentTree tournament={activity.tournament} />
         </div>
       </div>
     </Background>

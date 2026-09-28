@@ -57,7 +57,7 @@ export function MatchScreen({
           strategy={strategy}
           delay={BOT_DELAY}
         />
-        <div className="flex flex-col items-center justify-start justify-self-center w-full lg:w-4/5 xl:w-3/5 h-full p-4">
+        <div className="flex flex-col items-center justify-start mx-auto w-full lg:w-4/5 xl:w-3/5 h-full p-2 sm:p-4">
           <GameView localPlayerId={PLAYER_ID} />
         </div>
       </GameProvider>

@@ -19,17 +19,21 @@ export const ActionMap: React.FC<ActionMapProps> = ({
   state,
 }) => {
   return (
-    <div className="relative z-10 flex flex-wrap flex-row items-center justify-center gap-12 w-full h-full p-6">
-      {sceneActions
-        .filter((action) => isActionVisible(action, state))
-        .map((action, idx) => (
-          <ActionIcon
-            key={idx}
-            action={action}
-            enabled={isActionEnabled(action, state)}
-            affordable={canAfford(action, state)}
-          />
-        ))}
+    // Scrolls when the actions don't fit. The inner `m-auto` centers them
+    // without cutting off the top when they overflow.
+    <div className="relative z-10 flex w-full h-full overflow-y-auto pt-12 pb-4 px-4">
+      <div className="m-auto flex flex-wrap flex-row items-start justify-center gap-x-6 gap-y-8 sm:gap-12 short:gap-x-4 short:gap-y-2">
+        {sceneActions
+          .filter((action) => isActionVisible(action, state))
+          .map((action, idx) => (
+            <ActionIcon
+              key={idx}
+              action={action}
+              enabled={isActionEnabled(action, state)}
+              affordable={canAfford(action, state)}
+            />
+          ))}
+      </div>
     </div>
   )
 }
@@ -49,7 +53,7 @@ const ActionIcon: React.FC<ActionIconProps> = ({
   const hint = affordable ? action.hint : `You need $${fee} to enter`
   return (
     <button
-      className="flex flex-col items-start justify-center w-32"
+      className="flex flex-col items-center justify-start w-28 sm:w-32 short:w-24"
       style={{
         opacity: enabled ? 1 : 0.5,
         filter: enabled ? 'none' : 'grayscale(100%)',
@@ -59,25 +63,25 @@ const ActionIcon: React.FC<ActionIconProps> = ({
       disabled={!enabled}
       onClick={() => actions.perform(action)}
     >
-      <div className="relative d-flex w-32 h-32 hover:scale-105 transition-transform duration-200">
+      <div className="relative w-24 h-24 sm:w-32 sm:h-32 short:w-20 short:h-20 hover:scale-105 transition-transform duration-200">
         <div className="absolute inset-2 rounded-full bg-white/15 flex items-center justify-center"></div>
         <div
           style={
             { '--image-url': `url('${action.icon}')` } as React.CSSProperties
           }
-          className="absolute d-flex w-32 h-32 bg-[image:var(--image-url)] bg-cover bg-top"
+          className="absolute inset-0 bg-[image:var(--image-url)] bg-cover bg-top"
         ></div>
       </div>
-      <span className="flex justify-center text-center text-md text-white break-keep whitespace-nowrap w-full [text-shadow:0_1px_3px_black]">
+      <span className="text-center text-sm sm:text-base leading-tight text-white w-full [text-shadow:0_1px_3px_black]">
         {action.name}
       </span>
       {fee > 0 && (
-        <span className="flex justify-center text-center text-sm text-white/80 w-full [text-shadow:0_1px_3px_black]">
+        <span className="text-center text-xs sm:text-sm text-white/80 w-full [text-shadow:0_1px_3px_black]">
           Entry ${fee}
         </span>
       )}
       {!enabled && hint && (
-        <span className="flex justify-center text-center text-sm text-white/80 w-full [text-shadow:0_1px_3px_black]">
+        <span className="text-center text-xs sm:text-sm text-white/80 w-full [text-shadow:0_1px_3px_black]">
           {hint}
         </span>
       )}

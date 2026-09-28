@@ -40,18 +40,18 @@ function App() {
         <MenuImage image="/logo512.png" small={naming} />
         {naming ? (
           <form
-            className="flex flex-col items-center gap-4 w-full"
+            className="flex flex-col items-center gap-4 short:gap-2 w-full"
             onSubmit={handleStartGame}
           >
             <input
               autoFocus
-              className={`${panelClass} py-4 px-4 text-xl`}
+              className={`${panelClass} py-4 short:py-2 px-4 text-xl`}
               placeholder="Your name"
               maxLength={20}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <fieldset className={`${panelClass} py-3 px-4`}>
+            <fieldset className={`${panelClass} py-3 short:py-1 px-4`}>
               <legend className="px-1">Difficulty</legend>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {DIFFICULTY_ORDER.map((d) => (
@@ -59,7 +59,7 @@ function App() {
                     key={d}
                     type="button"
                     aria-pressed={difficulty === d}
-                    className={`py-2 border-1 cursor-pointer transition ${
+                    className={`py-2 short:py-1 border-1 cursor-pointer transition ${
                       difficulty === d
                         ? 'bg-(--primary-color) text-black border-(--primary-color)'
                         : 'border-white/50 hover:bg-white/10'
@@ -70,7 +70,7 @@ function App() {
                   </button>
                 ))}
               </div>
-              <p className="text-sm text-white/80 mt-2 min-h-10">
+              <p className="text-sm text-white/80 mt-2 short:mt-1 min-h-10 short:min-h-0">
                 {DIFFICULTIES[difficulty].description}
               </p>
             </fieldset>

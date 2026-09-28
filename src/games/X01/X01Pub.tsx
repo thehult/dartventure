@@ -1,6 +1,6 @@
 import { ScoreInput } from '@dartgames/core'
 import { useGame } from '@dartgames/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type {X01} from '@dartgames/games';
 import type { GameComponent } from '../GameComponent'
 import type { DartPlayer } from '@/types/Player'
@@ -14,8 +14,10 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     [game],
   )
   const [input, setInput] = useState<string>('')
+  const isPlayersTurn = running && state.currentPlayer === localPlayerId
 
   const handleButtonClick = (button: Key) => {
+    if (!isPlayersTurn) return
     if (button === 'undo') {
       setInput((prev) => prev.substring(0, prev.length - 1))
     } else if (button === 'enter') {
@@ -57,16 +59,28 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     return scores
   }, [history])
 
+  // Keep the latest scores in view as the chalkboard fills up.
+  const chalkboardRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const element = chalkboardRef.current
+    if (element) element.scrollTop = element.scrollHeight
+  }, [history, input])
+
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full">
-      <div className="flex flex-row justify-start items-start w-full md:w-2/3 xl:w-1/2 h-5/8 bg-neutral-950 border-double border-white border-1 overflow-y-scroll">
+    // The chalkboard takes whatever room the keypad leaves. On short screens
+    // (a phone held sideways) they sit side by side.
+    <div className="flex flex-col short:flex-row items-center short:items-stretch gap-1 short:gap-2 w-full h-full min-h-0">
+      <div
+        ref={chalkboardRef}
+        className="flex flex-row justify-start items-start w-full md:w-2/3 xl:w-1/2 short:w-1/2 flex-1 min-h-0 bg-neutral-950 border-double border-white border-1 overflow-y-auto"
+      >
         {players.map((player, pidx) => (
           <div
-            className="flex flex-col items-center justify-start w-full h-full text-4xl text-neutral-50 pt-2 pb-2 font-[Kalam]"
+            className="flex flex-col items-center justify-start w-full min-h-full text-4xl text-neutral-50 pt-2 pb-2 font-[Kalam]"
             key={player.id}
           >
             <span className="text-lg mt-0">{player.name}</span>
-            <div className="flex flex-col items-center  w-full px-8 ">
+            <div className="flex flex-col items-center w-full px-4 sm:px-8">
               {chalkboard[player.id].map((s, i, a) => (
                 <div
                   className={`flex w-full items-end ${pidx % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}
@@ -94,25 +108,11 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
                 </div>
               )}
             </div>
-            {/* <span
-              className=""
-              style={
-                state.currentPlayer === player.id
-                  ? { textDecoration: 'underline' }
-                  : {}
-              }
-            >
-              {state.scores[player.id]}
-            </span> */}
           </div>
         ))}
       </div>
-      <div className="w-full flex-grow-1"></div>
-      {/* <div className="flex flex-row items-center justify-center w-2/3 md:w-1/2 h-24 bg-neutral-950 text-neutral-50 text-5xl font-[Kalam]">
-        {input}
-      </div> */}
-      {running && state.currentPlayer === localPlayerId && (
-        <Keypad onKeyPress={handleButtonClick} />
+      {running && (
+        <Keypad onKeyPress={handleButtonClick} disabled={!isPlayersTurn} />
       )}
     </div>
   )
