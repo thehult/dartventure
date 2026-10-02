@@ -14,7 +14,7 @@ import ClickAnywhere from '@/components/ClickAnywhere'
 import { useScene } from '@/hooks/useScene'
 import { useGameFlow } from '@/hooks/useGameFlow'
 import { OPPONENT_ID, PLAYER_ID, useMatch } from '@/hooks/useMatch'
-import { createGameStrategy } from '@/util/strategy'
+import { createGameStrategy, createGameThrower } from '@/util/strategy'
 import { getGame } from '@/util/games'
 import { matchAdapter } from '@/util/persistence'
 
@@ -52,9 +52,14 @@ function MatchComponent() {
     () => createGameStrategy(gameId, opponent?.average ?? 50),
     [gameId, opponent],
   )
+  const throwDart = useMemo(
+    () => createGameThrower(opponent?.average ?? 50),
+    [opponent],
+  )
   useBot(game, strategy, {
     players: [OPPONENT_ID],
     delayMs: 800,
+    throwDart,
     enabled: matchState === 'running',
   })
 

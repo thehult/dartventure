@@ -1,3 +1,4 @@
+import { createThrower, modelFromAverage } from '@thehult/dartgames-simulation'
 import type { GameId } from '@/types/Actions'
 import type { DartGameStrategy } from '@thehult/dartgames-core'
 import {
@@ -7,8 +8,9 @@ import {
 } from '@thehult/dartgames-games/x01'
 
 /**
- * Picks a bot by the opponent's average (points per turn): beginners throw
- * singles, steady players add treble 20, strong players use the whole board.
+ * The strategy only sets the bot's style; how well it hits is decided by
+ * `createGameThrower`. Beginners avoid trebles, mid-level players add treble
+ * 20, and everyone else uses the whole board.
  */
 export const createGameStrategy = (
   gameId: GameId,
@@ -16,8 +18,12 @@ export const createGameStrategy = (
 ): DartGameStrategy<any, any, any> => {
   switch (gameId) {
     case 'x01':
-      if (average < 40) return X01CasualStrategy
-      if (average < 75) return X01SteadyStrategy
+      if (average < 30) return X01CasualStrategy
+      if (average < 45) return X01SteadyStrategy
       return X01Strategy
   }
 }
+
+/** Scatters the bot's darts so that aiming at treble 20 gives `average` per turn. */
+export const createGameThrower = (average: number) =>
+  createThrower(modelFromAverage(average))
