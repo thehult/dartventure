@@ -14,8 +14,8 @@ actions:
     options:
       gameId: x01
       gameOptions:
-        startScore: 501
-        doubleOut: true
+        startingScore: 501
+        checkoutRule: double-out
       opponent:
         relativeAverage: -5
         minAverage: 36
@@ -39,8 +39,8 @@ actions:
       minAverage: 38
       gameId: x01
       gameOptions:
-        startScore: 501
-        doubleOut: true
+        startingScore: 501
+        checkoutRule: double-out
     roundReward:
       reputation: 4
       money: 25

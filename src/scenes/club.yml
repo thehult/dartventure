@@ -14,8 +14,8 @@ actions:
     options:
       gameId: x01
       gameOptions:
-        startScore: 501
-        doubleOut: true
+        startingScore: 501
+        checkoutRule: double-out
       opponent:
         relativeAverage: -10
         minAverage: 30
@@ -39,8 +39,8 @@ actions:
       minAverage: 32
       gameId: x01
       gameOptions:
-        startScore: 501
-        doubleOut: true
+        startingScore: 501
+        checkoutRule: double-out
     roundReward:
       reputation: 3
       money: 10
@@ -80,8 +80,8 @@ stories:
       - match:
           gameId: x01
           gameOptions:
-            startScore: 501
-            doubleOut: true
+            startingScore: 501
+            checkoutRule: double-out
           opponent:
             name: Vince Harrow
             relativeAverage: -5

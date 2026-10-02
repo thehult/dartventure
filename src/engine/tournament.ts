@@ -1,7 +1,6 @@
 import { resolveAverage } from './match'
 import { DEFAULT_DIFFICULTY } from './difficulty'
 import type { Difficulty } from './difficulty'
-import type { PlayerId } from '@dartgames/core'
 import type { BotPlayer, DartPlayer } from '@/types/Player'
 import type {
   BracketMatch,
@@ -18,7 +17,7 @@ export type SimulateMatch = (
   gameId: string,
   gameOptions: GameOptions | undefined,
   players: Array<BotPlayer>,
-) => PlayerId
+) => string
 
 const DEFAULT_SPREAD = 5
 
@@ -36,7 +35,7 @@ const shuffle = <T>(items: Array<T>, random: Random): Array<T> => {
 
 /** Builds a single-elimination bracket for a power-of-two number of players. */
 export const createBracket = (
-  seeds: Array<PlayerId>,
+  seeds: Array<string>,
 ): { rounds: number; matches: Array<BracketMatch> } => {
   if (!isPowerOfTwo(seeds.length)) {
     throw new Error(
@@ -101,13 +100,13 @@ export const createTournament = (
   }
 }
 
-export const getPlayer = (tournament: Tournament, id: PlayerId) => {
+export const getPlayer = (tournament: Tournament, id: string) => {
   const player = tournament.players.find((p) => p.id === id)
   if (!player) throw new Error(`No player "${id}" in tournament`)
   return player
 }
 
-const involves = (match: BracketMatch, id: PlayerId) =>
+const involves = (match: BracketMatch, id: string) =>
   match.player1 === id || match.player2 === id
 
 export const finalMatch = (tournament: Tournament) =>
@@ -145,7 +144,7 @@ export const playerWins = (tournament: Tournament) =>
 export const recordResult = (
   tournament: Tournament,
   matchId: number,
-  winner: PlayerId,
+  winner: string,
 ): Tournament => {
   const match = tournament.matches.find((m) => m.id === matchId)
   if (!match) throw new Error(`No match ${matchId} in tournament`)

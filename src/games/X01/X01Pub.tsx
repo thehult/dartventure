@@ -1,20 +1,24 @@
-import { ScoreInput } from '@dartgames/core'
-import { useGame } from '@dartgames/react'
+import { stateAfterTurn } from '@thehult/dartgames-core'
+import { useGameContext } from '@thehult/dartgames-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type {X01} from '@dartgames/games';
+import type {
+  X01Config,
+  X01Input,
+  X01State,
+  X01TurnResult,
+} from '@thehult/dartgames-games/x01'
 import type { GameComponent } from '../GameComponent'
-import type { DartPlayer } from '@/types/Player'
-import type {Key} from '@/components/Keypad';
+import type { Key } from '@/components/Keypad'
 import Keypad from '@/components/Keypad'
 
 const X01Pub: GameComponent = ({ localPlayerId }) => {
-  const { game, state, running, history, submitInput } = useGame<X01>()
-  const players = useMemo<Array<DartPlayer>>(
-    () => game.players as Array<DartPlayer>,
-    [game],
-  )
+  const game = useGameContext<X01State, X01Config, X01Input, X01TurnResult>()
+  const { state, history, submitTurn } = game
+  const running = !game.isFinished
+  const players = state.players
+  const currentPlayer = game.currentPlayer
   const [input, setInput] = useState<string>('')
-  const isPlayersTurn = running && state.currentPlayer === localPlayerId
+  const isPlayersTurn = running && currentPlayer.id === localPlayerId
 
   const handleButtonClick = (button: Key) => {
     if (!isPlayersTurn) return
@@ -23,12 +27,12 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     } else if (button === 'enter') {
       let score = parseInt(input)
       if (isNaN(score)) score = 0
-      submitInput(new ScoreInput(score))
+      submitTurn(score)
       setInput('')
     } else {
       if (input.length < 3) {
         const score = parseInt(input + button)
-        if (score <= 180 && score <= state.scores[state.currentPlayer]) {
+        if (score <= 180 && score <= currentPlayer.remainingScore) {
           setInput((prev) => prev + button)
         }
       }
@@ -40,24 +44,23 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     score: number
   }
   const chalkboard = useMemo<Record<string, Array<ChalkboardEntry>>>(() => {
-    const scores: Record<string, Array<ChalkboardEntry>> = players.reduce(
-      (s, p) => ({ ...s, [p.id]: [{ score: history[0].scores[p.id] }] }),
-      {},
+    const start = history.turns[0]?.stateBefore ?? state
+    const scores: Record<string, Array<ChalkboardEntry>> = Object.fromEntries(
+      start.players.map((p) => [p.id, [{ score: p.remainingScore }]]),
     )
-    let previousPlayer = history[0].currentPlayer
-    for (let i = 1; i < history.length; i++) {
-      const turn: ChalkboardEntry = {
+    history.turns.forEach((turn, i) => {
+      const before = turn.stateBefore
+      const after = stateAfterTurn(history, i, state)
+      const idx = before.currentPlayerIndex
+      scores[before.players[idx].id].push({
         hit:
-          history[i - 1].scores[previousPlayer] -
-          history[i].scores[previousPlayer],
-        score: history[i].scores[previousPlayer],
-      }
-
-      scores[previousPlayer].push(turn)
-      previousPlayer = history[i].currentPlayer
-    }
+          before.players[idx].remainingScore -
+          after.players[idx].remainingScore,
+        score: after.players[idx].remainingScore,
+      })
+    })
     return scores
-  }, [history])
+  }, [history, state])
 
   // Keep the latest scores in view as the chalkboard fills up.
   const chalkboardRef = useRef<HTMLDivElement>(null)
@@ -79,7 +82,7 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
             className="flex flex-col items-center justify-start w-full min-h-full text-4xl text-neutral-50 pt-2 pb-2 font-[Kalam]"
             key={player.id}
           >
-            <span className="text-lg mt-0">{player.name}</span>
+            <span className="text-lg mt-0">{player.name ?? player.id}</span>
             <div className="flex flex-col items-center w-full px-4 sm:px-8">
               {chalkboard[player.id].map((s, i, a) => (
                 <div
@@ -99,7 +102,7 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
                   </span>
                 </div>
               ))}
-              {player.id === state.currentPlayer && (
+              {running && player.id === currentPlayer.id && (
                 <div className="flex flex-row w-full items-end">
                   <span className="w-full text-left text-3xl pt-1">
                     {input}

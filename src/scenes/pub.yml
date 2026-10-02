@@ -17,8 +17,8 @@ actions:
     options:
       gameId: x01
       gameOptions:
-        startScore: 301
-        doubleOut: true
+        startingScore: 301
+        checkoutRule: double-out
       opponent:
         relativeAverage: -20
     reward:
@@ -38,8 +38,8 @@ actions:
       relativeAverage: -15
       gameId: x01
       gameOptions:
-        startScore: 301
-        doubleOut: true
+        startingScore: 301
+        checkoutRule: double-out
     roundReward:
       reputation: 2
       money: 5
@@ -86,8 +86,8 @@ stories:
       - match:
           gameId: x01
           gameOptions:
-            startScore: 301
-            doubleOut: true
+            startingScore: 301
+            checkoutRule: double-out
           opponent:
             name: Dave
             relativeAverage: -10

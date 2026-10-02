@@ -25,7 +25,7 @@ import {
   recordResult,
   simulateBotMatches,
 } from './tournament'
-import type { IGame, IGameData } from '@dartgames/core'
+import type { GameSnapshot } from '@thehult/dartgames-react'
 import type { GameState } from '@/types/GameState'
 import type { TournamentActivity } from '@/types/Activity'
 import type { Action } from '@/types/Scene'
@@ -152,7 +152,7 @@ export const activeMatch = (state: GameState): ActiveMatch | undefined => {
 export const saveMatchProgress = (
   state: GameState,
   matchId: string,
-  gameData: IGameData<IGame>,
+  gameData: GameSnapshot,
 ): GameState => {
   const activity = state.activity
   if (activeMatch(state)?.id !== matchId || !activity) return state

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { PlayerId } from '@dartgames/core'
 import type { BracketMatch, Tournament } from '@/types/Tournament'
 import { PLAYER_ID } from '@/types/Player'
 
@@ -26,7 +25,7 @@ function Slot({
 }: {
   tournament: Tournament
   match: BracketMatch
-  playerId?: PlayerId
+  playerId?: string
 }) {
   const player = tournament.players.find((p) => p.id === playerId)
   const won = playerId !== undefined && match.winner === playerId

@@ -1,4 +1,3 @@
-import type { PlayerId } from '@dartgames/core'
 import type { GameOptions } from './Match'
 import type { BotPlayer, DartPlayer } from './Player'
 
@@ -8,9 +7,9 @@ export type BracketMatch = {
   id: number
   /** 1 is the first round, `Tournament.rounds` is the final. */
   round: number
-  player1?: PlayerId
-  player2?: PlayerId
-  winner?: PlayerId
+  player1?: string
+  player2?: string
+  winner?: string
   /** Where the winner goes. Undefined for the final. */
   next?: { matchId: number; slot: BracketSlot }
 }

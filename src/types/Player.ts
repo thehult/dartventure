@@ -1,8 +1,7 @@
-import type { IPlayer } from '@dartgames/core'
-
 export const PLAYER_ID = 'player'
 
-export interface DartPlayer extends IPlayer {
+export interface DartPlayer {
+  id: string
   name: string
 }
 

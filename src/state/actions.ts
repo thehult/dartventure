@@ -1,5 +1,5 @@
 import { update } from './store'
-import type { IGame, IGameData } from '@dartgames/core'
+import type { GameSnapshot } from '@thehult/dartgames-react'
 import type { Action } from '@/types/Scene'
 import type { MatchResult } from '@/types/Match'
 import type { Outcome } from '@/types/Outcome'
@@ -11,7 +11,7 @@ export const actions = {
   perform: (action: Action) => update((s) => flow.performAction(s, action)),
   advanceStory: (choice?: number) =>
     update((s) => flow.advanceStory(s, choice)),
-  saveMatchProgress: (matchId: string, gameData: IGameData<IGame>) =>
+  saveMatchProgress: (matchId: string, gameData: GameSnapshot) =>
     update((s) => flow.saveMatchProgress(s, matchId, gameData)),
   resolveMatch: (result: MatchResult) =>
     update((s) => flow.resolveMatch(s, result)),

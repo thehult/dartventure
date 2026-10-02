@@ -1,4 +1,4 @@
-import type { IGame, IGameData } from '@dartgames/core'
+import type { GameSnapshot } from '@thehult/dartgames-react'
 import type { Outcome } from './Outcome'
 import type { BotPlayer, DartPlayer } from './Player'
 
@@ -44,7 +44,7 @@ export type ActiveMatch = {
   penalty?: Outcome
   origin: MatchOrigin
   /** Serialized game, saved after every turn. */
-  gameData?: IGameData<IGame>
+  gameData?: GameSnapshot
 }
 
 export type MatchResult = {
