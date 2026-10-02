@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Phones held sideways: little height, so layouts go side by side. */
+@custom-variant short (@media (max-height: 540px));
+
 body {
   @apply m-0;
   font-family:

@@ -1,57 +1,141 @@
-import { useTournament } from '@/hooks/useTournament'
-import type { TournamentMatch } from '@/types/Tournament'
+import { useState } from 'react'
+import type { BracketMatch, Tournament } from '@/types/Tournament'
+import { PLAYER_ID } from '@/types/Player'
 
-function TournamentMatchComponent({ match }: { match: TournamentMatch }) {
-  const hasChildren = !!match.children
+const roundName = (round: number, rounds: number) => {
+  const fromEnd = rounds - round
+  if (fromEnd === 0) return 'Final'
+  if (fromEnd === 1) return 'Semi-finals'
+  if (fromEnd === 2) return 'Quarter-finals'
+  return `Round ${round}`
+}
 
+/** The round the player is playing, or the last one they played. */
+const playerRound = (tournament: Tournament) => {
+  const matches = tournament.matches.filter(
+    (m) => m.player1 === PLAYER_ID || m.player2 === PLAYER_ID,
+  )
+  return Math.max(1, ...matches.map((m) => m.round))
+}
+
+function Slot({
+  tournament,
+  match,
+  playerId,
+}: {
+  tournament: Tournament
+  match: BracketMatch
+  playerId?: string
+}) {
+  const player = tournament.players.find((p) => p.id === playerId)
+  const won = playerId !== undefined && match.winner === playerId
+  const lost = match.winner !== undefined && !won
   return (
-    <div className="relative flex flex-row items-center my-3">
-      {/* Children matches to the left */}
-      {hasChildren && (
-        <div className="flex flex-col justify-between relative mr-8">
-          {/* Vertical line connecting children */}
-          <div className="absolute left-full w-8 h-full">
-            <div className="absolute left-1/2 right-0 top-1/2 w-4 h-px bg-gray-400"></div>
-            <div className="absolute left-0 right-1/2 top-1/4 w-4 h-px bg-gray-400"></div>
-            <div className="absolute left-0 right-1/2 top-3/4 w-4 h-px bg-gray-400"></div>
-            <div className="absolute left-1/2 top-1/4 h-1/2 w-px bg-gray-400"></div>
-            {/* <div className="absolute left-0 top-1/8 h-1/4 w-px bg-gray-400"></div>
-            <div className="absolute left-0 top-5/8 h-1/4 w-px bg-gray-400"></div> */}
-          </div>
-          {match.children!.map((child) => (
-            <TournamentMatchComponent key={child.id} match={child} />
-          ))}
-        </div>
-      )}
+    <div
+      className={[
+        'text-md text-center py-1 px-2 w-full truncate',
+        playerId === PLAYER_ID ? 'font-bold' : '',
+        lost ? 'line-through opacity-50' : '',
+        won ? 'text-(--primary-color)' : '',
+      ].join(' ')}
+    >
+      {player?.name ?? '_'}
+    </div>
+  )
+}
 
-      {/* This match block */}
-      <div className="flex flex-col items-center w-48">
-        <div
-          className={`text-md text-center py-2 px-2 py-1 rounded mb-1 w-full ${match.player1?.id === 'player' ? 'font-bold' : ''}`}
-        >
-          {match.player1?.name || '_'}
-        </div>
-        <div
-          className={`text-md text-center py-2 px-2 py-1 rounded w-full  ${match.player2?.id === 'player' ? 'text-bold' : ''}`}
-        >
-          {match.player2?.name || '_'}
-        </div>
+function Match({
+  tournament,
+  match,
+}: {
+  tournament: Tournament
+  match: BracketMatch
+}) {
+  const isPlayers = match.player1 === PLAYER_ID || match.player2 === PLAYER_ID
+  return (
+    <div
+      className={`border-1 ${isPlayers ? 'border-(--primary-color)' : 'border-white/40'}`}
+    >
+      <Slot tournament={tournament} match={match} playerId={match.player1} />
+      <div className="h-px bg-white/40" />
+      <Slot tournament={tournament} match={match} playerId={match.player2} />
+    </div>
+  )
+}
+
+const roundMatches = (tournament: Tournament, round: number) =>
+  tournament.matches.filter((m) => m.round === round)
+
+/** The whole bracket, one column per round. */
+function FullBracket({ tournament }: { tournament: Tournament }) {
+  const rounds = Array.from({ length: tournament.rounds }, (_, i) => i + 1)
+  return (
+    // `w-max mx-auto` centers the bracket when it fits and lets it scroll
+    // from its left edge when it doesn't.
+    <div className="w-full overflow-x-auto">
+      <div className="flex flex-row items-stretch gap-6 w-max mx-auto">
+        {rounds.map((round) => (
+          <div key={round} className="flex flex-col w-36">
+            <h2 className="text-center text-lg mb-2">
+              {roundName(round, tournament.rounds)}
+            </h2>
+            <div className="flex flex-col justify-around flex-grow gap-3">
+              {roundMatches(tournament, round).map((match) => (
+                <Match key={match.id} tournament={tournament} match={match} />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
-export function TournamentTree() {
-  const { rootMatch } = useTournament()
-
-  if (!rootMatch) return <></>
-
+/** One round at a time, for narrow screens. */
+function RoundByRound({ tournament }: { tournament: Tournament }) {
+  const [round, setRound] = useState(() => playerRound(tournament))
+  const arrowClass =
+    'px-4 py-2 text-2xl disabled:opacity-30 enabled:cursor-pointer'
   return (
-    <div className="flex items-center overflow-auto p-6 min-h-2/3 text-neutral-50 font-[Kalam]">
-      <div className="bg-neutral-950 border-double border-white border-1">
-        <h1 className="my-2 text-center text-2xl">Tournament</h1>
-        <TournamentMatchComponent match={rootMatch} />
+    <div className="flex flex-col w-full gap-2">
+      <div className="flex items-center justify-between">
+        <button
+          className={arrowClass}
+          aria-label="Previous round"
+          disabled={round <= 1}
+          onClick={() => setRound(round - 1)}
+        >
+          ‹
+        </button>
+        <h2 className="text-lg">{roundName(round, tournament.rounds)}</h2>
+        <button
+          className={arrowClass}
+          aria-label="Next round"
+          disabled={round >= tournament.rounds}
+          onClick={() => setRound(round + 1)}
+        >
+          ›
+        </button>
+      </div>
+      <div className="grid grid-cols-2 short:grid-cols-4 gap-2">
+        {roundMatches(tournament, round).map((match) => (
+          <Match key={match.id} tournament={tournament} match={match} />
+        ))}
       </div>
     </div>
+  )
+}
+
+export function TournamentTree({ tournament }: { tournament: Tournament }) {
+  return (
+    <>
+      <div className="hidden md:block short:hidden w-full">
+        <FullBracket tournament={tournament} />
+      </div>
+      {/* Phones, including ones held sideways. */}
+      <div className="md:hidden short:block w-full">
+        <RoundByRound tournament={tournament} />
+      </div>
+    </>
   )
 }

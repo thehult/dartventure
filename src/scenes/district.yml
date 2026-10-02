@@ -1,0 +1,108 @@
+background: /game_assets/scenes/district/background.svg
+characters:
+  organiser:
+    name: Margaret, League Organiser
+  kev:
+    name: Kev
+    image: /game_assets/scenes/pub/supporter.png
+actions:
+  - name: League fixture
+    icon: /game_assets/icons/dartboard.svg
+    description: Play a District League fixture. 501 double out.
+    action: match
+    entryFee: 10
+    options:
+      gameId: x01
+      gameOptions:
+        startingScore: 501
+        checkoutRule: double-out
+      opponent:
+        relativeAverage: -5
+        minAverage: 36
+    reward:
+      reputation: 8
+      money: 30
+      flags:
+        districtMatchWon: true
+    penalty:
+      reputation: -4
+  - name: District Open
+    icon: /game_assets/icons/trophy.svg
+    description: Sixteen of the district's best, 501 double out.
+    visible: completed("district-open-invite")
+    action: tournament
+    entryFee: 50
+    options:
+      name: District Open
+      players: 16
+      relativeAverage: -10
+      minAverage: 38
+      gameId: x01
+      gameOptions:
+        startingScore: 501
+        checkoutRule: double-out
+    roundReward:
+      reputation: 4
+      money: 25
+    reward:
+      reputation: 20
+      money: 250
+      flags:
+        districtChampion: true
+  - name: Back to the map
+    icon: /game_assets/icons/map.svg
+    description: Leave the district hall.
+    action: navigate
+    sceneId: world
+stories:
+  - name: district-welcome
+    script:
+      - character: organiser
+      - dialogue: Ah, the club's new champion. I'm Margaret, I run the District League.
+      - dialogue: Fixtures are **$10** a match. Travel, board fees, sandwiches. It adds up.
+      - dialogue: Win enough and you'll be invited to the *District Open*, sixteen of the best in the district.
+      - dialogue: Reach **110** reputation and I'll send you an invitation.
+
+  - name: kev-fan
+    when: flags.districtMatchWon
+    script:
+      - character: kev
+      - dialogue: OI! OVER HERE!
+      - dialogue: Sorry. Sorry. I'm Kev. I saw your match. That checkout!
+      - dialogue: I'm starting a fan club. Well, it's just me so far. But it's a club!
+      - choice:
+          - text: Welcome aboard, Kev.
+            goto: welcome
+          - text: Er... thanks?
+      - dialogue: I'll take that as a yes!
+      - goto: done
+      - label: welcome
+      - dialogue: YES! I'm getting shirts printed!
+      - label: done
+      - set:
+          fanClub: true
+      - give:
+          reputation: 3
+      - dialogue: Word is getting around. **+3** *reputation*!
+
+  - name: district-open-invite
+    when: reputation >= 110
+    script:
+      - character: organiser
+      - dialogue: Well, well. Your name keeps coming up.
+      - dialogue: Here's your invitation to the District Open. Entry is **$50**.
+      - dialogue: Sixteen players, four rounds. Win it and people outside the district will know your name.
+
+  - name: nationals-invite
+    when: flags.districtChampion
+    script:
+      - if: "!flags.fanClub"
+        goto: organiser
+      - character: kev
+      - dialogue: DISTRICT CHAMPION! I told everyone! I TOLD them!
+      - label: organiser
+      - character: organiser
+      - dialogue: Congratulations. The national federation rang this morning.
+      - dialogue: You've qualified for the national ranking circuit.
+      - dialogue: The Nationals are a different world. Televised, even.
+      - dialogue: It's on your map. Good luck.

@@ -15,7 +15,7 @@ export type Key =
   | 'undo'
   | 'enter'
 
-const INPUT_BUTTONS: Key[] = [
+const INPUT_BUTTONS: Array<Key> = [
   '1',
   '2',
   '3',
@@ -43,11 +43,13 @@ const keyToString = (key: Key): string => {
 
 type KeypadProps = {
   onKeyPress?: (key: Key) => void
+  /** Shown but not usable, e.g. during the opponent's turn. */
+  disabled?: boolean
 }
 
-const Keypad: React.FC<KeypadProps> = ({ onKeyPress }) => {
+const Keypad: React.FC<KeypadProps> = ({ onKeyPress, disabled = false }) => {
   const handleKeyboard = (event: KeyboardEvent) => {
-    if (!onKeyPress) return
+    if (!onKeyPress || disabled) return
     if (event.repeat) return
 
     if (event.key === 'Enter') onKeyPress('enter')
@@ -62,10 +64,13 @@ const Keypad: React.FC<KeypadProps> = ({ onKeyPress }) => {
   useEventListener('keydown', handleKeyboard)
 
   return (
-    <div className="flex flex-row flex-wrap items-start justify-start w-full bg-neutral-950 text-neutral-50 mt-1 font-[Kalam]">
+    <div
+      className={`grid grid-cols-3 short:grid-rows-4 w-full md:w-2/3 xl:w-1/2 short:w-1/2 bg-neutral-950 text-neutral-50 font-[Kalam] transition-opacity ${disabled ? 'opacity-50' : ''}`}
+    >
       {INPUT_BUTTONS.map((key) => (
         <button
-          className="flex items-center justify-center w-1/3 bg-neutral-800 hover:bg-neutral-900 hover:cursor-pointer text-neutral-50 p-6 text-xl font-[Kalam]"
+          className="flex items-center justify-center bg-neutral-800 hover:bg-neutral-900 active:bg-neutral-700 enabled:hover:cursor-pointer text-neutral-50 py-5 short:py-0 text-2xl font-[Kalam] select-none"
+          disabled={disabled}
           onClick={() => onKeyPress?.(key)}
           key={key}
         >

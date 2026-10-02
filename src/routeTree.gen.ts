@@ -13,9 +13,6 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as GameIndexImport } from './routes/game/index'
-import { Route as GameTournamentImport } from './routes/game/tournament'
-import { Route as GameMatchImport } from './routes/game/match'
-import { Route as GameMapImport } from './routes/game/map'
 
 // Create/Update Routes
 
@@ -31,24 +28,6 @@ const GameIndexRoute = GameIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const GameTournamentRoute = GameTournamentImport.update({
-  id: '/game/tournament',
-  path: '/game/tournament',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const GameMatchRoute = GameMatchImport.update({
-  id: '/game/match',
-  path: '/game/match',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const GameMapRoute = GameMapImport.update({
-  id: '/game/map',
-  path: '/game/map',
-  getParentRoute: () => rootRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -58,27 +37,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/game/map': {
-      id: '/game/map'
-      path: '/game/map'
-      fullPath: '/game/map'
-      preLoaderRoute: typeof GameMapImport
-      parentRoute: typeof rootRoute
-    }
-    '/game/match': {
-      id: '/game/match'
-      path: '/game/match'
-      fullPath: '/game/match'
-      preLoaderRoute: typeof GameMatchImport
-      parentRoute: typeof rootRoute
-    }
-    '/game/tournament': {
-      id: '/game/tournament'
-      path: '/game/tournament'
-      fullPath: '/game/tournament'
-      preLoaderRoute: typeof GameTournamentImport
       parentRoute: typeof rootRoute
     }
     '/game/': {
@@ -95,57 +53,36 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/game/map': typeof GameMapRoute
-  '/game/match': typeof GameMatchRoute
-  '/game/tournament': typeof GameTournamentRoute
   '/game': typeof GameIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/game/map': typeof GameMapRoute
-  '/game/match': typeof GameMatchRoute
-  '/game/tournament': typeof GameTournamentRoute
   '/game': typeof GameIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/game/map': typeof GameMapRoute
-  '/game/match': typeof GameMatchRoute
-  '/game/tournament': typeof GameTournamentRoute
   '/game/': typeof GameIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/game/map' | '/game/match' | '/game/tournament' | '/game'
+  fullPaths: '/' | '/game'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/game/map' | '/game/match' | '/game/tournament' | '/game'
-  id:
-    | '__root__'
-    | '/'
-    | '/game/map'
-    | '/game/match'
-    | '/game/tournament'
-    | '/game/'
+  to: '/' | '/game'
+  id: '__root__' | '/' | '/game/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  GameMapRoute: typeof GameMapRoute
-  GameMatchRoute: typeof GameMatchRoute
-  GameTournamentRoute: typeof GameTournamentRoute
   GameIndexRoute: typeof GameIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  GameMapRoute: GameMapRoute,
-  GameMatchRoute: GameMatchRoute,
-  GameTournamentRoute: GameTournamentRoute,
   GameIndexRoute: GameIndexRoute,
 }
 
@@ -160,23 +97,11 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/game/map",
-        "/game/match",
-        "/game/tournament",
         "/game/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/game/map": {
-      "filePath": "game/map.tsx"
-    },
-    "/game/match": {
-      "filePath": "game/match.tsx"
-    },
-    "/game/tournament": {
-      "filePath": "game/tournament.tsx"
     },
     "/game/": {
       "filePath": "game/index.tsx"

@@ -1,23 +1,24 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import {
-  RouterProvider,
-  createRouteMask,
-  createRouter,
-} from '@tanstack/react-router'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
+import { removeLegacyKeys } from './state/store'
+import { scenes } from './scenes'
+import { validateScenes } from './scenes/validate'
+import { gameIds } from './games/registry'
 
-const gameRouteMask = createRouteMask({
-  routeTree,
-  // @ts-ignore
-  from: '/game/$',
-  to: '/game',
-})
+removeLegacyKeys()
+
+if (import.meta.env.DEV) {
+  for (const error of validateScenes(scenes, gameIds())) {
+    console.error(`Content error: ${error}`)
+  }
+}
 
 // Create a new router instance
 const router = createRouter({
@@ -27,7 +28,6 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
-  routeMasks: [gameRouteMask],
 })
 
 // Register the router instance for type safety
@@ -42,9 +42,9 @@ const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
-    // <StrictMode>
-    <RouterProvider router={router} />,
-    // </StrictMode>,
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
   )
 }
 

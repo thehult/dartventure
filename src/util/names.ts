@@ -1,5 +1,22 @@
-export const randomMaleName = () =>
-  maleFirstNames[Math.floor(Math.random() * maleFirstNames.length)]
+export const randomMaleName = (random: () => number = Math.random) =>
+  maleFirstNames[Math.floor(random() * maleFirstNames.length)]
+
+/** Picks `count` different names, none of them in `exclude`. */
+export const randomMaleNames = (
+  count: number,
+  exclude: Array<string> = [],
+  random: () => number = Math.random,
+): Array<string> => {
+  const available = [...new Set(maleFirstNames)].filter(
+    (name) => !exclude.includes(name),
+  )
+  const names: Array<string> = []
+  while (names.length < count && available.length > 0) {
+    const [name] = available.splice(Math.floor(random() * available.length), 1)
+    names.push(name)
+  }
+  return names
+}
 
 const maleFirstNames = [
   'James',
