@@ -12,7 +12,7 @@ actions:
     description: Play a game of darts with a regular.
     action: match
     options:
-      average: -20
+      average: 45
       gameId: x01
       gameOptions:
         startingScore: 301
@@ -30,7 +30,7 @@ actions:
     action: tournament
     options:
       players: 8
-      average: -10
+      average: 60
       gameId: x01
       gameOptions:
         startingScore: 301
