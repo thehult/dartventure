@@ -1,10 +1,9 @@
 import type { Match, MatchOptions } from '@/types/Match'
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
 import { useGameSave } from './useGameSave'
 import { createOpponent, type Opponent } from '@/types/Player'
 import type { GameId } from '@/types/Actions'
-import type { IGame, IGameData } from '@dartgames/core'
 
 export const PLAYER_ID = 'player'
 export const OPPONENT_ID = 'opponent'
@@ -15,18 +14,6 @@ export const useMatch = () => {
     'current-match',
     undefined,
   )
-  const [gameData, setGameData] = useSessionStorage<IGameData<any> | undefined>(
-    'current-game-data',
-    undefined,
-  )
-  const initialGameData = useRef(gameData)
-
-  useEffect(() => {
-    if (!initialGameData.current) {
-      initialGameData.current = gameData
-    }
-  }, [gameData])
-
   const hasMatch = useMemo(() => typeof match !== 'undefined', [match])
   const gameId = useMemo(() => match?.gameId as GameId, [match])
   const players = useMemo(() => match?.players ?? [], [match])
@@ -36,6 +23,7 @@ export const useMatch = () => {
       matchOptions.opponent ?? createOpponent(matchOptions.average ?? 50)
 
     const newMatch: Match = {
+      id: crypto.randomUUID(),
       gameId: matchOptions.gameId,
       players: [
         {
@@ -51,17 +39,11 @@ export const useMatch = () => {
     setMatch(newMatch)
   }
 
-  const saveGameData = (game: IGame) => {
-    setGameData(game.toJson())
-  }
-
   return {
     hasMatch,
     match: match as Match,
     gameId,
-    initialGameData: initialGameData.current,
     players,
     createMatch,
-    saveGameData,
   }
 }

@@ -11,10 +11,11 @@ export type MatchOptions = {
 }
 
 export type Match = {
+  /** Unique per match; keys the persisted game. */
+  id: string
   gameId: GameId
   players: DartPlayer[]
   gameOptions?: { [key: string]: any }
-  gameState?: any
   reward?: Outcome
   penalty?: Outcome
 }
