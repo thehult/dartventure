@@ -1,4 +1,4 @@
-background: /game_assets/scenes/club/background.svg
+background: /game_assets/scenes/club/background.png
 characters:
   captain:
     name: Captain Doreen

@@ -1,4 +1,4 @@
-background: /game_assets/scenes/nationals/background.svg
+background: /game_assets/scenes/nationals/background.png
 characters:
   official:
     name: Federation Official
