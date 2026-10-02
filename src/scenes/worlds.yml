@@ -1,4 +1,4 @@
-background: /game_assets/scenes/worlds/background.svg
+background: /game_assets/scenes/worlds/background.png
 characters:
   mc:
     name: The MC
