@@ -1,12 +1,11 @@
-'use strict'
-
 import { Background } from '@/components/Background'
-import { createFileRoute, type ReactNode } from '@tanstack/react-router'
-import { GameBot, GameProvider } from '@dartgames/react'
+import { createFileRoute } from '@tanstack/react-router'
+import { useBot, useDartGame } from '@thehult/dartgames-react'
+import type { X01State } from '@thehult/dartgames-games/x01'
 import X01Pub from '@/games/X01/X01Pub'
+import type { GameComponent } from '@/games/GameComponent'
 import type { SceneId } from '@/scenes/scenes'
-import { useMemo, useRef, useState } from 'react'
-import { Field, type IPlayer } from '@dartgames/core'
+import { useEffect, useMemo, useState } from 'react'
 import type { Opponent } from '@/types/Player'
 import { useGameSave } from '@/hooks/useGameSave'
 import type { GameId, Outcome } from '@/types/Actions'
@@ -15,10 +14,11 @@ import ClickAnywhere from '@/components/ClickAnywhere'
 import { useScene } from '@/hooks/useScene'
 import { useGameFlow } from '@/hooks/useGameFlow'
 import { OPPONENT_ID, PLAYER_ID, useMatch } from '@/hooks/useMatch'
-import { createGameStrategy } from '@/util/games'
-import { useDartGame } from '@/hooks/useDartGame'
+import { createGameStrategy, createGameThrower } from '@/util/strategy'
+import { getGame } from '@/util/games'
+import { matchAdapter } from '@/util/persistence'
 
-const gameComponents: Record<GameId, Record<SceneId, ReactNode>> = {
+const gameComponents: Record<GameId, Record<SceneId, GameComponent>> = {
   x01: {
     pub: X01Pub,
     world: X01Pub,
@@ -35,7 +35,7 @@ function MatchComponent() {
 
   const { scene, sceneId } = useScene()
   const { addMoney, addReputation } = useGameSave()
-  const { match, gameId, initialGameData, players, saveGameData } = useMatch()
+  const { match, gameId, players } = useMatch()
   const { goToScene } = useGameFlow()
 
   const opponent = useMemo(() => {
@@ -43,15 +43,33 @@ function MatchComponent() {
   }, [players])
 
   const GameComponent = gameComponents[gameId][sceneId]
-  const game = useDartGame(gameId, players, match.gameOptions, initialGameData)
-  const gameStrategy = useRef(createGameStrategy(gameId))
+  const game = useDartGame(
+    getGame(gameId),
+    { config: match.gameOptions as any, players },
+    { persistence: { id: match.id, adapter: matchAdapter } },
+  )
+  const strategy = useMemo(
+    () => createGameStrategy(gameId, opponent?.average ?? 50),
+    [gameId, opponent],
+  )
+  const throwDart = useMemo(
+    () => createGameThrower(opponent?.average ?? 50),
+    [opponent],
+  )
+  useBot(game, strategy, {
+    players: [OPPONENT_ID],
+    delayMs: 800,
+    throwDart,
+    enabled: matchState === 'running',
+  })
 
-  const handleBotHit = (hit: Field) => {
-    console.log('Bot hit', hit)
-  }
-
-  const handleGameOver = (winners: IPlayer[]) => {
-    if (winners.some((p) => p.id === PLAYER_ID)) {
+  // The match is decided as soon as one player has checked out.
+  const winnerId = (game.state as X01State).players.find(
+    (p) => p.finishPosition === 1,
+  )?.id
+  useEffect(() => {
+    if (!winnerId || matchState !== 'running') return
+    if (winnerId === PLAYER_ID) {
       setMatchState('won')
       addMoney(match.reward?.money ?? 0)
       addReputation(match.reward?.reputation ?? 0)
@@ -60,37 +78,19 @@ function MatchComponent() {
       addMoney(match.penalty?.money ?? 0)
       addReputation(match.penalty?.reputation ?? 0)
     }
-  }
-
-  const handleStateChange = (gameState: any) => {
-    saveGameData(gameState)
-  }
+  }, [winnerId])
 
   const handleNavigateBack = () => {
     goToScene(sceneId)
   }
 
-  console.log(game)
-
   return (
     <Background background={scene.background}>
-      <GameProvider
-        game={game}
-        onStateChange={handleStateChange}
-        onGameOver={handleGameOver}
-      >
-        {/* @ts-ignore */}
-        <GameBot
-          playerId={OPPONENT_ID}
-          average={opponent?.average ?? 50}
-          strategy={gameStrategy.current}
-          delay={20}
-          onHit={handleBotHit}
-        />
+      {!game.isHydrating && (
         <div className="flex flex-col items-center justify-start justify-self-center w-full lg:w-4/5 xl:w-3/5 h-full p-4">
-          <GameComponent localPlayerId={PLAYER_ID} />
+          <GameComponent game={game} localPlayerId={PLAYER_ID} />
         </div>
-      </GameProvider>
+      )}
       {matchState === 'won' && (
         <ClickAnywhere onClick={handleNavigateBack}>
           <Dialogue visible={true} speaker="You won!">

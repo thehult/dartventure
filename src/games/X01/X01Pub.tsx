@@ -1,17 +1,20 @@
-import { ScoreInput } from '@dartgames/core'
-import { type X01 } from '@dartgames/games'
-import { useGame } from '@dartgames/react'
+import { stateAfterTurn } from '@thehult/dartgames-core'
+import type {
+  X01Config,
+  X01Input,
+  X01State,
+  X01TurnResult,
+} from '@thehult/dartgames-games/x01'
 import { useMemo, useState } from 'react'
-import type { GameComponent } from '../GameComponent'
-import type { DartPlayer } from '@/types/Player'
+import type { GameComponent, GameHandle } from '../GameComponent'
 import Keypad, { type Key } from '@/components/Keypad'
 
-const X01Pub: GameComponent = ({ localPlayerId }) => {
-  const { game, state, running, history, submitInput } = useGame<X01>()
-  const players = useMemo<DartPlayer[]>(
-    () => game.players as DartPlayer[],
-    [game],
-  )
+const X01Pub: GameComponent = ({ game: handle, localPlayerId }) => {
+  const game = handle as GameHandle<X01State, X01Config, X01Input, X01TurnResult>
+  const { state, history, submitTurn } = game
+  const running = !game.isFinished
+  const currentPlayerId = game.currentPlayer.id
+  const players = state.players
   const [input, setInput] = useState<string>('')
 
   const handleButtonClick = (button: Key) => {
@@ -20,12 +23,12 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     } else if (button === 'enter') {
       let score = parseInt(input)
       if (isNaN(score)) score = 0
-      submitInput(new ScoreInput(score))
+      submitTurn(score)
       setInput('')
     } else {
       if (input.length < 3) {
         const score = parseInt(input + button)
-        if (score <= 180 && score <= state.scores[state.currentPlayer]) {
+        if (score <= 180 && score <= game.currentPlayer.remainingScore) {
           setInput((prev) => prev + button)
         }
       }
@@ -37,24 +40,21 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
     score: number
   }
   const chalkboard = useMemo<Record<string, ChalkboardEntry[]>>(() => {
-    const scores: Record<string, ChalkboardEntry[]> = players.reduce(
-      (s, p) => ({ ...s, [p.id]: [{ score: history[0].scores[p.id] }] }),
-      {},
+    const start = history.turns[0]?.stateBefore ?? state
+    const scores: Record<string, ChalkboardEntry[]> = Object.fromEntries(
+      players.map((p, i) => [p.id, [{ score: start.players[i].remainingScore }]]),
     )
-    let previousPlayer = history[0].currentPlayer
-    for (let i = 1; i < history.length; i++) {
-      const turn: ChalkboardEntry = {
-        hit:
-          history[i - 1].scores[previousPlayer] -
-          history[i].scores[previousPlayer],
-        score: history[i].scores[previousPlayer],
-      }
-
-      scores[previousPlayer].push(turn)
-      previousPlayer = history[i].currentPlayer
-    }
+    history.turns.forEach((turn, i) => {
+      const before = turn.stateBefore
+      const after = stateAfterTurn(history, i, state)
+      const idx = before.currentPlayerIndex
+      scores[before.players[idx].id].push({
+        hit: before.players[idx].remainingScore - after.players[idx].remainingScore,
+        score: after.players[idx].remainingScore,
+      })
+    })
     return scores
-  }, [history])
+  }, [history, state, players])
 
   return (
     <div className="flex flex-col items-center justify-start w-full h-full">
@@ -64,7 +64,7 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
             className="flex flex-col items-center justify-start w-full h-full text-4xl text-neutral-50 pt-2 pb-2 font-[Kalam]"
             key={player.id}
           >
-            <span className="text-lg mt-0">{player.name}</span>
+            <span className="text-lg mt-0">{player.name ?? player.id}</span>
             <div className="flex flex-col items-center  w-full px-8 ">
               {chalkboard[player.id].map((s, i, a) => (
                 <div
@@ -84,7 +84,7 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
                   </span>
                 </div>
               ))}
-              {player.id === state.currentPlayer && (
+              {running && player.id === currentPlayerId && (
                 <div className="flex flex-row w-full items-end">
                   <span className="w-full text-left text-3xl pt-1">
                     {input}
@@ -110,7 +110,7 @@ const X01Pub: GameComponent = ({ localPlayerId }) => {
       {/* <div className="flex flex-row items-center justify-center w-2/3 md:w-1/2 h-24 bg-neutral-950 text-neutral-50 text-5xl font-[Kalam]">
         {input}
       </div> */}
-      {running && state.currentPlayer === localPlayerId && (
+      {running && currentPlayerId === localPlayerId && (
         <Keypad onKeyPress={handleButtonClick} />
       )}
     </div>

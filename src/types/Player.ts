@@ -1,10 +1,10 @@
 import { randomMaleName } from '@/util/names'
-import type { IPlayer } from '@dartgames/core'
 
 export const PLAYER_ID = 'player'
 export const OPPONENT_ID = 'opponent'
 
-export interface DartPlayer extends IPlayer {
+export interface DartPlayer {
+  id: string
   name: string
 }
 

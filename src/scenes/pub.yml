@@ -12,11 +12,11 @@ actions:
     description: Play a game of darts with a regular.
     action: match
     options:
-      average: -20
+      average: 45
       gameId: x01
       gameOptions:
-        startScore: 301
-        doubleOut: true
+        startingScore: 301
+        checkoutRule: double-out
     reward:
       reputation: 5
     penalty:
@@ -30,11 +30,11 @@ actions:
     action: tournament
     options:
       players: 8
-      average: -10
+      average: 60
       gameId: x01
       gameOptions:
-        startScore: 301
-        doubleOut: true
+        startingScore: 301
+        checkoutRule: double-out
     reward:
       reputation: 5
     penalty:
