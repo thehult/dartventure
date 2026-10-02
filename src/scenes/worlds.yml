@@ -7,7 +7,7 @@ characters:
     image: /game_assets/scenes/pub/bartender.png
   vince:
     name: Vince Harrow
-    image: /game_assets/scenes/pub/darter.png
+    image: /game_assets/scenes/club/darter.png
   kev:
     name: Kev
     image: /game_assets/scenes/pub/supporter.png

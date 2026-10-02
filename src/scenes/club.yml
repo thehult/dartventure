@@ -4,7 +4,7 @@ characters:
     name: Captain Doreen
   vince:
     name: Vince Harrow
-    image: /game_assets/scenes/pub/darter.png
+    image: /game_assets/scenes/club/darter.png
 actions:
   - name: League night
     icon: /game_assets/icons/dartboard.svg

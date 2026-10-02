@@ -4,7 +4,7 @@ characters:
     name: Federation Official
   vince:
     name: Vince Harrow
-    image: /game_assets/scenes/pub/darter.png
+    image: /game_assets/scenes/club/darter.png
   lou:
     name: Lucky Lou
     image: /game_assets/scenes/pub/gambler.png
