@@ -61,6 +61,9 @@ function App() {
               Continue as {saves[0]?.name}
             </MenuButton>
             <MenuButton onClick={() => setNaming(true)}>New Game</MenuButton>
+            <p className="w-full md:w-1/2 lg:w-1/3 bg-black/70 text-white text-center text-sm short:text-xs px-4 py-2 rounded-sm">
+              AI disclaimer: all art in this game is AI-generated. I have neither the necessary skills nor money to pay an artist. 
+            </p>
           </>
         )}
       </Menu>
