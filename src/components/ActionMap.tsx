@@ -35,12 +35,12 @@ export const ActionMap: React.FC<ActionMapProps> = ({
   return (
     // Scrolls when the actions don't fit. The inner `m-auto` centers them
     // without cutting off the top when they overflow.
-    <div className="relative z-10 flex w-full h-full overflow-y-auto pt-12 pb-14 px-4">
+    <div className="relative z-10 flex w-full h-full overflow-y-auto pt-12 pb-20 px-4">
       <div className="m-auto flex flex-wrap flex-row items-start justify-center gap-x-6 gap-y-8 sm:gap-12 short:gap-x-4 short:gap-y-2">
         {places.map(renderIcon)}
       </div>
       {tools.length > 0 && (
-        <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3">
+        <div className="absolute bottom-4 left-0 right-0 flex flex-wrap justify-center gap-3 px-2">
           {tools.map((action, idx) => (
             <ToolButton key={idx} action={action} onPanel={onPanel} />
           ))}
@@ -55,11 +55,11 @@ const ToolButton: React.FC<{
   onPanel: (panel: PanelId) => void
 }> = ({ action, onPanel }) => (
   <button
-    className="flex items-center gap-2 rounded-full bg-black/40 hover:bg-black/60 px-3 py-1.5 text-sm text-white [text-shadow:0_1px_3px_black] transition-colors"
+    className="flex items-center gap-2.5 cursor-pointer rounded-full bg-black/60 hover:bg-black/80 border border-white/30 px-5 py-2.5 text-base sm:text-lg font-semibold text-white [text-shadow:0_1px_3px_black] transition-colors"
     title={action.description}
     onClick={() => action.action === 'panel' && onPanel(action.panel)}
   >
-    <img src={action.icon} alt="" className="w-5 h-5" />
+    <img src={action.icon} alt="" className="w-7 h-7" />
     {action.name}
   </button>
 )
