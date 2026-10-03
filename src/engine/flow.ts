@@ -10,7 +10,7 @@ import {
   formatOutcome,
   scaleOutcome,
 } from './outcome'
-import { createActiveMatch, recordMatch } from './match'
+import { OPPONENT_ID, createActiveMatch, recordMatch } from './match'
 import { advanceScript, runScript } from './story'
 import { simulateMatch } from './simulate'
 import { START_LOCATION } from './save'
@@ -31,7 +31,8 @@ import type { TournamentActivity } from '@/types/Activity'
 import type { Action } from '@/types/Scene'
 import type { ActiveMatch, MatchResult } from '@/types/Match'
 import type { BotPlayer } from '@/types/Player'
-import { PLAYER_ID } from '@/types/Player'
+import type { Difficulty } from './difficulty'
+import { PLAYER_ID, clampAverage } from '@/types/Player'
 import { games } from '@/games/registry'
 import { findStory, getScene, scenes } from '@/scenes'
 
@@ -45,7 +46,8 @@ const MAX_AUTO_STORIES = 20
 export const settle = (state: GameState): GameState => {
   for (let i = 0; i < MAX_AUTO_STORIES && state.activity === null; i++) {
     const story = getScene(state.location).stories.find(
-      (s) => !state.completedStories.includes(s.name) && evaluate(s.when, state),
+      (s) =>
+        !state.completedStories.includes(s.name) && evaluate(s.when, state),
     )
     if (!story) break
     state = runScript(state, state.location, story, 0)
@@ -77,7 +79,9 @@ export const isActionVisible = (action: Action, state: GameState) =>
   evaluate(action.visible, state)
 
 export const entryFee = (action: Action) =>
-  action.action === 'navigate' ? 0 : (action.entryFee ?? 0)
+  action.action === 'navigate' || action.action === 'panel'
+    ? 0
+    : (action.entryFee ?? 0)
 
 export const canAfford = (action: Action, state: GameState) =>
   state.money >= entryFee(action)
@@ -90,6 +94,9 @@ export const performAction = (state: GameState, action: Action): GameState => {
   if (!isActionVisible(action, state) || !isActionEnabled(action, state)) {
     return state
   }
+
+  // Panels are shown by the UI and don't change the game.
+  if (action.action === 'panel') return state
 
   state = { ...state, money: state.money - entryFee(action) }
   switch (action.action) {
@@ -131,6 +138,50 @@ export const performAction = (state: GameState, action: Action): GameState => {
       }
     }
   }
+}
+
+export type PracticeOptions = {
+  gameId: string
+  gameOptions?: Record<string, unknown>
+  /** The opponent's absolute three-dart average. */
+  opponentAverage: number
+}
+
+/**
+ * A match against a bot of the player's choosing, with nothing at stake: it
+ * costs nothing, pays nothing and leaves stats and average alone.
+ */
+export const startPractice = (
+  state: GameState,
+  options: PracticeOptions,
+): GameState => {
+  if (state.activity !== null) return state
+  const match = createActiveMatch(
+    state,
+    { gameId: options.gameId, gameOptions: options.gameOptions },
+    { type: 'action' },
+    {},
+    {
+      id: OPPONENT_ID,
+      name: 'Practice partner',
+      average: clampAverage(options.opponentAverage),
+    },
+    true,
+  )
+  return { ...state, activity: { type: 'match', match } }
+}
+
+export const setDifficulty = (
+  state: GameState,
+  difficulty: Difficulty,
+): GameState =>
+  state.difficulty === difficulty ? state : { ...state, difficulty }
+
+export const setPlayerName = (state: GameState, name: string): GameState => {
+  name = name.trim()
+  return name === '' || name === state.playerName
+    ? state
+    : { ...state, playerName: name }
 }
 
 export const advanceStory = (state: GameState, choice?: number): GameState => {
@@ -212,6 +263,9 @@ export const describeMatchResult = (
     }
   }
   const match = activeMatch(state)
+  if (match?.practice) {
+    return { title, text: won ? 'Nice practice!' : 'Better luck next time.' }
+  }
   return { title, text: formatOutcome(won ? match?.reward : match?.penalty) }
 }
 
@@ -223,6 +277,7 @@ export const resolveMatch = (
   const match = activeMatch(state)
   const activity = state.activity
   if (!match || !activity) return state
+  if (match.practice) return settle({ ...state, activity: null })
   state = recordMatch(state, result)
   const origin = match.origin
 

@@ -32,6 +32,21 @@ actions:
     visible: completed("worlds-invite")
     action: navigate
     sceneId: worlds
+  - name: Practice
+    icon: /game_assets/icons/practice.svg
+    description: Throw a few darts. Nothing at stake.
+    action: panel
+    panel: practice
+  - name: Stats
+    icon: /game_assets/icons/stats.svg
+    description: See how you're doing
+    action: panel
+    panel: stats
+  - name: Settings
+    icon: /game_assets/icons/settings.svg
+    description: Change your name and the difficulty
+    action: panel
+    panel: settings
 stories:
   - name: intro
     script:

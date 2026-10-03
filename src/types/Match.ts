@@ -43,6 +43,8 @@ export type ActiveMatch = {
   reward?: Outcome
   penalty?: Outcome
   origin: MatchOrigin
+  /** A practice match: it has no stakes and doesn't count towards stats. */
+  practice?: boolean
   /** Serialized game, saved after every turn. */
   gameData?: GameSnapshot
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Action } from '@/types/Scene'
+import type { Action, PanelId } from '@/types/Scene'
 import type { GameState } from '@/types/GameState'
 import {
   canAfford,
@@ -12,11 +12,13 @@ import { actions } from '@/state/actions'
 type ActionMapProps = {
   sceneActions: Array<Action>
   state: GameState
+  onPanel: (panel: PanelId) => void
 }
 
 export const ActionMap: React.FC<ActionMapProps> = ({
   sceneActions,
   state,
+  onPanel,
 }) => {
   return (
     // Scrolls when the actions don't fit. The inner `m-auto` centers them
@@ -31,6 +33,7 @@ export const ActionMap: React.FC<ActionMapProps> = ({
               action={action}
               enabled={isActionEnabled(action, state)}
               affordable={canAfford(action, state)}
+              onPanel={onPanel}
             />
           ))}
       </div>
@@ -42,12 +45,14 @@ type ActionIconProps = {
   action: Action
   enabled: boolean
   affordable: boolean
+  onPanel: (panel: PanelId) => void
 }
 
 const ActionIcon: React.FC<ActionIconProps> = ({
   action,
   enabled,
   affordable,
+  onPanel,
 }) => {
   const fee = entryFee(action)
   const hint = affordable ? action.hint : `You need $${fee} to enter`
@@ -61,7 +66,11 @@ const ActionIcon: React.FC<ActionIconProps> = ({
       }}
       title={enabled ? action.description : (hint ?? action.description)}
       disabled={!enabled}
-      onClick={() => actions.perform(action)}
+      onClick={() =>
+        action.action === 'panel'
+          ? onPanel(action.panel)
+          : actions.perform(action)
+      }
     >
       <div className="relative w-24 h-24 sm:w-32 sm:h-32 short:w-20 short:h-20 hover:scale-105 transition-transform duration-200">
         <div className="absolute inset-2 rounded-full bg-white/15 flex items-center justify-center"></div>

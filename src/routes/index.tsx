@@ -2,12 +2,9 @@ import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import type { Difficulty } from '@/engine/difficulty'
 import { Background } from '@/components/Background'
+import { DifficultyPicker } from '@/components/DifficultyPicker'
 import { Menu, MenuButton, MenuImage } from '@/components/Menu'
-import {
-  DEFAULT_DIFFICULTY,
-  DIFFICULTIES,
-  DIFFICULTY_ORDER,
-} from '@/engine/difficulty'
+import { DEFAULT_DIFFICULTY } from '@/engine/difficulty'
 import { createSave, listSaves, openSave } from '@/state/store'
 
 export const Route = createFileRoute('/')({
@@ -53,36 +50,14 @@ function App() {
             />
             <fieldset className={`${panelClass} py-3 short:py-1 px-4`}>
               <legend className="px-1">Difficulty</legend>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {DIFFICULTY_ORDER.map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    aria-pressed={difficulty === d}
-                    className={`py-2 short:py-1 border-1 cursor-pointer transition ${
-                      difficulty === d
-                        ? 'bg-(--primary-color) text-black border-(--primary-color)'
-                        : 'border-white/50 hover:bg-white/10'
-                    }`}
-                    onClick={() => setDifficulty(d)}
-                  >
-                    {DIFFICULTIES[d].name}
-                  </button>
-                ))}
-              </div>
-              <p className="text-sm text-white/80 mt-2 short:mt-1 min-h-10 short:min-h-0">
-                {DIFFICULTIES[difficulty].description}
-              </p>
+              <DifficultyPicker value={difficulty} onChange={setDifficulty} />
             </fieldset>
             <MenuButton type="submit">Start</MenuButton>
             <MenuButton onClick={() => setNaming(false)}>Back</MenuButton>
           </form>
         ) : (
           <>
-            <MenuButton
-              visible={saves.length > 0}
-              onClick={handleContinueGame}
-            >
+            <MenuButton visible={saves.length > 0} onClick={handleContinueGame}>
               Continue as {saves[0]?.name}
             </MenuButton>
             <MenuButton onClick={() => setNaming(true)}>New Game</MenuButton>
