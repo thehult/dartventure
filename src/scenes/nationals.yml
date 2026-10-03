@@ -55,7 +55,7 @@ actions:
       money: 750
       flags:
         nationalChampion: true
-  - name: Back to the map
+  - name: Back home
     icon: /game_assets/icons/map.svg
     description: Leave the venue.
     action: navigate

@@ -100,7 +100,7 @@ describe('game flow', () => {
 
   it('keeps opponents above their minimum average', () => {
     let state = { ...inPubWithInvite(), playerAverage: 20 }
-    state = performAction(state, action('pub', 'Back to the map'))
+    state = performAction(state, action('pub', 'Back home'))
     state = skipStories(settle({ ...state, completedStories: [...state.completedStories, 'club-invite'] }))
     state = skipStories(performAction(state, action('world', 'The Club')))
     state = performAction(state, action('club', 'League night'))
