@@ -49,7 +49,7 @@ actions:
       money: 100
       flags:
         clubChampion: true
-  - name: Back to the map
+  - name: Back home
     icon: /game_assets/icons/map.svg
     description: Leave the club.
     action: navigate

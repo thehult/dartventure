@@ -48,7 +48,7 @@ actions:
       money: 40
       flags:
         pubChampion: true
-  - name: Back to the map
+  - name: Back home
     icon: /game_assets/icons/map.svg
     description: Leave the pub.
     action: navigate

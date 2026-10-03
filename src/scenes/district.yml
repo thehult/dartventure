@@ -49,7 +49,7 @@ actions:
       money: 250
       flags:
         districtChampion: true
-  - name: Back to the map
+  - name: Back home
     icon: /game_assets/icons/map.svg
     description: Leave the district hall.
     action: navigate
