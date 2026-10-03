@@ -78,7 +78,7 @@ type StatBarProps = {
 
 const StatBar: React.FC<StatBarProps> = ({ state }) => {
   return (
-    <div className="w-full flex justify-between items-center gap-2 px-3 pt-2 pb-6 fixed top-0 left-0 z-50 pointer-events-none bg-linear-to-b from-black/60 to-transparent [text-shadow:0_1px_3px_black] *:pointer-events-auto">
+    <div className="w-full flex flex-col items-end gap-2 short:gap-1 px-3 pt-2 pb-6 fixed top-0 left-0 z-50 pointer-events-none bg-linear-to-b from-black/60 to-transparent [text-shadow:0_1px_3px_black] *:pointer-events-auto">
       <Stat
         icon={<StarIcon />}
         label="Reputation"
