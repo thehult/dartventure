@@ -1,4 +1,4 @@
-background: /game_assets/scenes/world/background.png
+background: /game_assets/scenes/home/background.png
 characters:
   you:
     name: You

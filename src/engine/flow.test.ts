@@ -37,7 +37,7 @@ const newGame = () => skipStories(settle(createGameState('Phil')))
 
 /** In the pub with 20 reputation, $20 and the tournament invite. */
 const inPubWithInvite = () => {
-  const state = skipStories(performAction(newGame(), action('world', 'The Pub')))
+  const state = skipStories(performAction(newGame(), action('home', 'The Pub')))
   return {
     ...skipStories(settle({ ...state, reputation: 20 })),
     money: 20,
@@ -54,7 +54,7 @@ describe('game flow', () => {
   })
 
   it('plays the pub stories on entering the pub', () => {
-    let state = performAction(newGame(), action('world', 'The Pub'))
+    let state = performAction(newGame(), action('home', 'The Pub'))
     expect(state.location).toBe('pub')
     expect(state.activity).toMatchObject({ type: 'story', story: 'welcome' })
     state = skipStories(state)
@@ -63,11 +63,11 @@ describe('game flow', () => {
 
   it('ignores actions while something else is going on', () => {
     const state = settle(createGameState('Phil'))
-    expect(performAction(state, action('world', 'The Pub'))).toBe(state)
+    expect(performAction(state, action('home', 'The Pub'))).toBe(state)
   })
 
   it('applies the reward of a won match and counts stats', () => {
-    let state = skipStories(performAction(newGame(), action('world', 'The Pub')))
+    let state = skipStories(performAction(newGame(), action('home', 'The Pub')))
     state = performAction(state, action('pub', 'Play a chump'))
     expect(state.activity?.type).toBe('match')
     expect(describeMatchResult(state, true).text).toBe(
@@ -83,7 +83,7 @@ describe('game flow', () => {
   })
 
   it('sets the opponent average relative to the player', () => {
-    let state = skipStories(performAction(newGame(), action('world', 'The Pub')))
+    let state = skipStories(performAction(newGame(), action('home', 'The Pub')))
     state = { ...state, playerAverage: 70 }
     state = performAction(state, action('pub', 'Play a chump'))
     if (state.activity?.type !== 'match') throw new Error('No match')
@@ -91,7 +91,7 @@ describe('game flow', () => {
   })
 
   it('matches opponents to the difficulty', () => {
-    let state = skipStories(performAction(newGame(), action('world', 'The Pub')))
+    let state = skipStories(performAction(newGame(), action('home', 'The Pub')))
     state = { ...state, playerAverage: 70, difficulty: 'pro' }
     state = performAction(state, action('pub', 'Play a chump'))
     if (state.activity?.type !== 'match') throw new Error('No match')
@@ -102,14 +102,14 @@ describe('game flow', () => {
     let state = { ...inPubWithInvite(), playerAverage: 20 }
     state = performAction(state, action('pub', 'Back home'))
     state = skipStories(settle({ ...state, completedStories: [...state.completedStories, 'club-invite'] }))
-    state = skipStories(performAction(state, action('world', 'The Club')))
+    state = skipStories(performAction(state, action('home', 'The Club')))
     state = performAction(state, action('club', 'League night'))
     if (state.activity?.type !== 'match') throw new Error('No match')
     expect(state.activity.match.players[1].average).toBe(30)
   })
 
   it('invites the player to the tournament at 20 reputation', () => {
-    let state = skipStories(performAction(newGame(), action('world', 'The Pub')))
+    let state = skipStories(performAction(newGame(), action('home', 'The Pub')))
     const tournament = action('pub', 'Pub tournament')
     expect(isActionVisible(tournament, state)).toBe(false)
 
@@ -184,7 +184,7 @@ describe('repair', () => {
         character: null,
       },
     })
-    expect(state.location).toBe('world')
+    expect(state.location).toBe('home')
     expect(state.activity).toBeNull()
   })
 
@@ -227,6 +227,6 @@ describe('repair', () => {
 
   it('opens panels without changing the game', () => {
     const state = newGame()
-    expect(performAction(state, action('world', 'Stats'))).toBe(state)
+    expect(performAction(state, action('home', 'Stats'))).toBe(state)
   })
 })

@@ -9,9 +9,9 @@ describe('scene content', () => {
     expect(Object.keys(scenes).sort()).toEqual([
       'club',
       'district',
+      'home',
       'nationals',
       'pub',
-      'world',
       'worlds',
     ])
   })
