@@ -2,7 +2,7 @@ import { DEFAULT_DIFFICULTY, DIFFICULTIES } from './difficulty'
 import type { Difficulty } from './difficulty'
 import type { GameState } from '@/types/GameState'
 
-export const START_LOCATION = 'world'
+export const START_LOCATION = 'home'
 export const DEFAULT_PLAYER_AVERAGE = 50
 
 type SaveV1 = {
@@ -56,6 +56,10 @@ export const migrateSave = (save: AnySave): GameState => {
   while (save.version !== CURRENT_VERSION) {
     const migrate = migrations[save.version] as (s: AnySave) => AnySave
     save = migrate(save)
+  }
+  // The home scene used to be called 'world'.
+  if ((save.location as string) === 'world') {
+    save = { ...save, location: START_LOCATION }
   }
   return save
 }

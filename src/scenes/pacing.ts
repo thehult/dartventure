@@ -80,9 +80,9 @@ export const playCampaign = (
     )
   const navigateTo = (sceneId: string) =>
     available().find((a) => a.action === 'navigate' && a.sceneId === sceneId)
-  /** The most advanced venue unlocked on the map. */
+  /** The most advanced venue unlocked at home. */
   const furthestVenue = () => {
-    const venues = getScene('world').actions.filter(
+    const venues = getScene('home').actions.filter(
       (a) => a.action === 'navigate' && isActionVisible(a, state),
     )
     const last = venues[venues.length - 1]
@@ -127,7 +127,7 @@ export const playCampaign = (
     // Free to act.
     const target = grinding ? 'pub' : furthestVenue()
     if (state.location !== target) {
-      perform(navigateTo(state.location === 'world' ? target : 'world'))
+      perform(navigateTo(state.location === 'home' ? target : 'home'))
       continue
     }
     const tournament = available().find((a) => a.action === 'tournament')

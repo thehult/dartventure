@@ -53,7 +53,7 @@ actions:
     icon: /game_assets/icons/map.svg
     description: Leave the club.
     action: navigate
-    sceneId: world
+    sceneId: home
 stories:
   - name: club-welcome
     script:

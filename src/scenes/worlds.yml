@@ -59,7 +59,7 @@ actions:
     icon: /game_assets/icons/map.svg
     description: Leave the arena.
     action: navigate
-    sceneId: world
+    sceneId: home
 stories:
   - name: worlds-welcome
     script:
