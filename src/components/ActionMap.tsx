@@ -55,7 +55,7 @@ const ToolButton: React.FC<{
   onPanel: (panel: PanelId) => void
 }> = ({ action, onPanel }) => (
   <button
-    className="flex items-center gap-2.5 rounded-full bg-black/60 hover:bg-black/80 border border-white/30 px-5 py-2.5 text-base sm:text-lg font-semibold text-white [text-shadow:0_1px_3px_black] transition-colors"
+    className="flex items-center gap-2.5 cursor-pointer rounded-full bg-black/60 hover:bg-black/80 border border-white/30 px-5 py-2.5 text-base sm:text-lg font-semibold text-white [text-shadow:0_1px_3px_black] transition-colors"
     title={action.description}
     onClick={() => action.action === 'panel' && onPanel(action.panel)}
   >
