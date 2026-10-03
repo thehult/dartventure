@@ -8,7 +8,10 @@ import {
   performAction,
   repair,
   resolveMatch,
+  setDifficulty,
+  setPlayerName,
   settle,
+  startPractice,
   startTournamentMatch,
   tournamentSummary,
 } from './flow'
@@ -183,5 +186,47 @@ describe('repair', () => {
     })
     expect(state.location).toBe('world')
     expect(state.activity).toBeNull()
+  })
+
+  describe('practice', () => {
+    const practice = (state: GameState, opponentAverage = 40) =>
+      startPractice(state, {
+        gameId: 'x01',
+        gameOptions: { startingScore: 301, checkoutRule: 'double-out' },
+        opponentAverage,
+      })
+
+    it('plays a bot at the chosen average, ignoring difficulty', () => {
+      const state = practice({ ...newGame(), difficulty: 'pro' }, 40)
+      if (state.activity?.type !== 'match') throw new Error('No match')
+      expect(state.activity.match).toMatchObject({ practice: true })
+      expect(state.activity.match.players[1].average).toBe(40)
+    })
+
+    it('has no stakes and leaves stats and average alone', () => {
+      const before = newGame()
+      let state = practice(before)
+      expect(describeMatchResult(state, true).text).toBe('Nice practice!')
+      state = resolveMatch(state, { won: true, average: 100 })
+      expect(state.activity).toBeNull()
+      expect(state).toEqual(before)
+    })
+
+    it('cannot start while something else is going on', () => {
+      const state = settle(createGameState('Phil'))
+      expect(practice(state)).toBe(state)
+    })
+  })
+
+  it('changes difficulty and name, keeping the old ones for blank names', () => {
+    const state = newGame()
+    expect(setDifficulty(state, 'hard').difficulty).toBe('hard')
+    expect(setPlayerName(state, '  Bob ').playerName).toBe('Bob')
+    expect(setPlayerName(state, '   ')).toBe(state)
+  })
+
+  it('opens panels without changing the game', () => {
+    const state = newGame()
+    expect(performAction(state, action('world', 'Stats'))).toBe(state)
   })
 })

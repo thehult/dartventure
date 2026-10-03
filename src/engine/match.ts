@@ -49,6 +49,7 @@ export const createActiveMatch = (
   origin: MatchOrigin,
   outcomes: { reward?: Outcome; penalty?: Outcome } = {},
   opponent?: BotPlayer,
+  practice = false,
 ): ActiveMatch => {
   getGame(options.gameId) // Fail early on unknown games
   return {
@@ -70,6 +71,7 @@ export const createActiveMatch = (
     reward: outcomes.reward,
     penalty: outcomes.penalty,
     origin,
+    ...(practice && { practice }),
   }
 }
 

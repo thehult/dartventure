@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import type { PanelId } from '@/types/Scene'
 import type { GameState } from '@/types/GameState'
 import { Background } from '@/components/Background'
 import { Character } from '@/components/Character'
 import { Dialogue } from '@/components/Dialogue'
 import { ActionMap } from '@/components/ActionMap'
 import StatBar from '@/components/StatBar'
+import { StatsPanel } from '@/components/StatsPanel'
+import { SettingsPanel } from '@/components/SettingsPanel'
+import { PracticePanel } from '@/components/PracticePanel'
+import { closeSave } from '@/state/store'
 import { findStory, getScene } from '@/scenes'
 import { availableChoices } from '@/engine/story'
 import { actions } from '@/state/actions'
@@ -13,6 +19,8 @@ import { actions } from '@/state/actions'
 const ENTER_TIMEOUT = 1500
 
 export function SceneScreen({ state }: { state: GameState }) {
+  const navigate = useNavigate()
+  const [panel, setPanel] = useState<PanelId | null>(null)
   const scene = getScene(state.location)
   const activity = state.activity?.type === 'story' ? state.activity : null
   const characterId = activity?.character ?? null
@@ -58,7 +66,27 @@ export function SceneScreen({ state }: { state: GameState }) {
         </Dialogue>
       )}
       {!activity && (
-        <ActionMap sceneActions={scene.actions} state={state} />
+        <ActionMap
+          sceneActions={scene.actions}
+          state={state}
+          onPanel={setPanel}
+        />
+      )}
+      {!activity && panel === 'stats' && (
+        <StatsPanel state={state} onClose={() => setPanel(null)} />
+      )}
+      {!activity && panel === 'settings' && (
+        <SettingsPanel
+          state={state}
+          onClose={() => setPanel(null)}
+          onQuit={() => {
+            closeSave()
+            navigate({ to: '/' })
+          }}
+        />
+      )}
+      {!activity && panel === 'practice' && (
+        <PracticePanel state={state} onClose={() => setPanel(null)} />
       )}
     </Background>
   )

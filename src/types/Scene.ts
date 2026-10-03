@@ -59,7 +59,19 @@ export type NavigateAction = ActionBase & {
   sceneId: string
 }
 
-export type Action = MatchAction | TournamentAction | NavigateAction
+/** Opens a screen laid over the scene, e.g. the player's stats. */
+export type PanelAction = ActionBase & {
+  action: 'panel'
+  panel: PanelId
+}
+
+export type PanelId = 'stats' | 'settings' | 'practice'
+
+export type Action =
+  | MatchAction
+  | TournamentAction
+  | NavigateAction
+  | PanelAction
 
 export type Choice = {
   text: string

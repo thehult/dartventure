@@ -116,6 +116,11 @@ export const validateScenes = (
             errors.push(`${where}: unknown scene "${action.sceneId}"`)
           }
           break
+        case 'panel':
+          if (!['stats', 'settings', 'practice'].includes(action.panel)) {
+            errors.push(`${where}: unknown panel "${String(action.panel)}"`)
+          }
+          break
         case 'match':
           checkMatchOptions(`${where}.options`, action.options)
           checkAmount(`${where}.entryFee`, action.entryFee)
